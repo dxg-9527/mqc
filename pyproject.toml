@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mqc"
+version = "2.0.0"
+description = "Quantitative detection and correction of genome-scale metabolic models"
+readme = "README.md"
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+dependencies = [
+  "cobra>=0.25,<0.31",
+  "numpy>=1.22,<2",
+  "pandas>=1.5,<3",
+  "openpyxl>=3.1,<4",
+  "matplotlib>=3.7,<4",
+  "memote>=0.17,<0.18",
+  "cplex>=22.1,<23",
+  "d3flux>=0.2,<0.3",
+]
+
+[project.scripts]
+mqc = "mqc.main:main"
+
+[project.urls]
+Repository = "https://github.com/dxg-9527/mqc"
+Website = "https://mqc.biodesign.ac.cn/"
+
+[tool.setuptools.packages.find]
+include = ["mqc*"]
+
+[tool.setuptools.package-data]
+"mqc.summary" = ["*.xlsx", "*.xml.gz"]
+
+[tool.black]
+line-length = 88
+target-version = ["py38"]

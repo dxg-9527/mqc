@@ -1,0 +1,68 @@
+{
+  "test_date": "2026-10-14",
+  "model": "iCN718",
+  "input_sha256": "e146ba7e83c6913d64621c435e73f3fbbb9178f1917545d72eb5976eecd95d1a",
+  "baseline": "ModelCheck from the AWS deployment entry point, with the deployed MQC core modules.",
+  "workflow": "Detection followed by complete correction, using the same model, environment and PYTHONHASHSEED=0 for both runs.",
+  "environment": {
+    "python": "3.8.5",
+    "cobra": "0.29.1"
+  },
+  "equivalence_passed": true,
+  "checks": {
+    "check_result.json": {
+      "equivalent": true,
+      "differences": []
+    },
+    "control_result.json": {
+      "equivalent": true,
+      "differences": []
+    },
+    "model_info.json": {
+      "equivalent": true,
+      "differences": []
+    },
+    "corrected_model": {
+      "equivalent": true,
+      "differences": [],
+      "aws_growth": 0.0,
+      "public_growth": 0.0,
+      "reactions": 1017,
+      "metabolites": 887,
+      "genes": 709
+    },
+    "reference_model": {
+      "equivalent": true,
+      "differences": [],
+      "aws_growth": 1.3135912923645499,
+      "public_growth": 1.3135912923645499,
+      "reactions": 1015,
+      "metabolites": 888,
+      "genes": 709
+    },
+    "diagnostic_outputs": {
+      "equivalent": true,
+      "differences": []
+    },
+    "serialized_models": {
+      "equivalent": true,
+      "files": [
+        "iCN718.xml",
+        "iCN718.json",
+        "check_model.json"
+      ]
+    }
+  },
+  "shared_export_issue": {
+    "strict_sbml_readback_passed": false,
+    "json_readback_passed": true,
+    "detail": "Both workflows return normally and generate identical model files. The final SBML contains an unnamed compartment; metabolites 4.600e and 1.000e have empty compartment identifiers. Strict SBML readback fails in both versions. The accompanying iCN718.json files can be loaded and are byte-identical; their biomass objective value is 0.0 in both versions.",
+    "algorithm_changes_to_work_around_issue": false
+  },
+  "model_file_sha256": {
+    "iCN718.xml": "aa74de5d2aa35443b90958ed9ef49df4e11c7bca6eee178b631d305acae08908",
+    "iCN718.json": "139b4164dd113c9913c5a93334ceb159f267f809f557fd3bfff12a4977c60ce1",
+    "check_model.json": "78e4ea16f7c6df6b8152ab30876dbd4836f9705ef5b442f596ef16ea566aa259"
+  },
+  "core_source_sha256": "9dc34cac9b4f2927a04dbe8b010837c94409cd72d3519b8e9a7282512403a205"
+}

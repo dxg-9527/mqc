@@ -1,0 +1,5 @@
+database,cohort_id,total_models,error_models,error_rate_pct,denominator,source_file
+CarveMe,quantitative_core_6543,5585,5585,100.0,"models in database within the 6,543-model core cohort",carveme_check.xlsx (archived source)
+BiGG,quantitative_core_6543,73,66,90.41095890410958,"models in database within the 6,543-model core cohort",bigg_check.xlsx (archived source)
+ModelSEED,quantitative_core_6543,79,79,100.0,"models in database within the 6,543-model core cohort",seed_check.xlsx (archived source)
+VMH,quantitative_core_6543,806,806,100.0,"models in database within the 6,543-model core cohort",virtual_check.xlsx (archived source)

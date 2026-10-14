@@ -1,0 +1,4 @@
+record,stage,reaction_id,initial,final,unit,path_flux,evidence,action
+overall_nadh,quantitative_comparison,,665.802,0,mmol gDCW^-1 h^-1,,,Two causal reactions constrained
+path_1,d3flux_iteration_1,FDR,,,mmol gDCW^-1 h^-1,500.000,charge imbalance +1,"bounds [-1000, 1000] to [0, 0]"
+path_2,d3flux_iteration_2,ABAH,,,mmol gDCW^-1 h^-1,1.667,"H imbalance -2; O imbalance +1","bounds [-1000, 1000] to [0, 0]"

@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+build/
+dist/
+output/
+.DS_Store
+.env
+.pypirc
+figures/**/review/
+figures/fig4_final/code/text_inventory.json
+figures/fig4_final/code/text_fit_check.json
+figures/fig4_final/Fig4_preview.png

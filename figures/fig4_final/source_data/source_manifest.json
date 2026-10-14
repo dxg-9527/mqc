@@ -1,0 +1,56 @@
+[
+  {
+    "packaged_path": "source_data/fig4/causal_path_fluxes.csv",
+    "origin": "Archived manuscript source data",
+    "sha256": "298e74ee96651dd7239649dafd7763d81d679deb9766c9fa0cc195e32dda2806",
+    "bytes": 661
+  },
+  {
+    "packaged_path": "source_data/fig4/diagnostic_quantitative_data.csv",
+    "origin": "Archived manuscript source data",
+    "sha256": "108a49e3242799b339fbdbca046ebbd093277d1adad5dc078cc59fadcfddd4bc",
+    "bytes": 788
+  },
+  {
+    "packaged_path": "source_data/fig4/matched_glucose_comparison.csv",
+    "origin": "Archived manuscript source data",
+    "sha256": "e1dd34b8e8dd963f35fa4f67c76702691e9a345a6453f4630803c64cb97173da",
+    "bytes": 275
+  },
+  {
+    "packaged_path": "source_data/fig4/reaction_revisions.csv",
+    "origin": "Archived manuscript source data",
+    "sha256": "e3a0ab4aa42c6f20e18bfef1da6f65b5af6cfc8286e222811eb0759af62dc42b",
+    "bytes": 390
+  },
+  {
+    "packaged_path": "source_data/fig4/reaction_stoichiometry.csv",
+    "origin": "Archived manuscript source data",
+    "sha256": "cc3eb1d7dc5a91a7834a01233214e8f2ce5fe5f5e4522c823ae87f3e98042de0",
+    "bytes": 1238
+  },
+  {
+    "packaged_path": "source_data/fig4/reducing_power_paths.csv",
+    "origin": "Archived manuscript source data",
+    "sha256": "201f9a46869b8e10b0bb2d4763d4142ebdd2c51b8080f76e56d8fef8781a2f00",
+    "bytes": 405
+  },
+  {
+    "packaged_path": "source_data/iCN718.xml",
+    "origin": "Archived manuscript source data",
+    "sha256": "48dbfdc91dd5c8ac1e82572170f6d59eeab24deb4436a333ef095eb55695bc8e",
+    "bytes": 2880549
+  },
+  {
+    "packaged_path": "Fig4_panel_c/data/matched_glucose_retest.csv",
+    "origin": "Archived manuscript source data",
+    "sha256": "1b93eab7a24327e865783050b27e579f3f97b346e8ab8c61000f74fa931224c5",
+    "bytes": 304
+  },
+  {
+    "packaged_path": "Fig4_panel_c/data/no_carbon_objectives.csv",
+    "origin": "Archived manuscript source data",
+    "sha256": "87172f13cd2756fbb6c4ca67150329ce14231ccc5fcec9f522cb4d9cf820af30",
+    "bytes": 180
+  }
+]

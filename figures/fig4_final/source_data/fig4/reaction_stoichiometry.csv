@@ -1,0 +1,13 @@
+﻿reaction_id,reaction_name,equation,lower_bound,upper_bound
+FDR,,nadph_c + rdxo_c <=> h_c + nadp_c + rdxr_c,-1000.0,1000.0
+RDXR,Rubredoxin oxidoreductase,nadh_c + 2.0 rdxo_c <=> h_c + nad_c + 2.0 rdxr_c,-1000.0,1000.0
+MTHFR3,5 10 methylenetetrahydrofolatereductase  NADPH,2.0 h_c + mlthf_c + nadph_c --> 5mthf_c + nadp_c,0.0,1000.0
+MTHFR2,"5,10-methylenetetrahydrofolate reductase (NADH)",2.0 h_c + mlthf_c + nadh_c <=> 5mthf_c + nad_c,-1000.0,1000.0
+ABAH,,2ommbl_c + amet_c <=> ahcys_c + h_c + q8_c,-1000.0,1000.0
+OMMBLHX3,"2-Octaprenyl-3-methyl-6-methoxy-1,4-benzoquinol hydroxylase (anaerobic)",2ommbl_c + 2.0 atp_c + 3.0 h2o_c + nad_c <=> 2omhmbl_c + 2.0 adp_c + 3.0 h_c + nadh_c + 2.0 pi_c,-1000.0,1000.0
+DMQMT,3-Dimethylubiquinonol 3-methyltransferase,2omhmbl_c + amet_c --> ahcys_c + h_c + q8h2_c,0.0,1000.0
+CYTBD,Cytochrome oxidase bd (ubiquinol-8: 2 protons),2.0 h_c + 0.5 o2_c + q8h2_c --> h2o_c + 2.0 h_e + q8_c,0.0,1000.0
+EX_h_e,H+ exchange,h_e <=> ,-10.0,1000.0
+ATPS4r,ATP synthase (four protons for one ATP),adp_c + 4.0 h_e + pi_c <=> atp_c + h2o_c + 3.0 h_c,-1000.0,1000.0
+MADH,,mmtsa_c + nad_c --> co2_c + mmal_c + nadh_c,0.0,1000.0
+UREA,Urease,h2o_c + 2.0 h_c + urea_c <=> co2_c + 2.0 nh4_c,-1000.0,1000.0

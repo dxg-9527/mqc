@@ -1,0 +1,4 @@
+metric,initial,post_qc,unit,carbon_source,uptake,other_carbon_sources
+Maximum NADH production,520.555556,18.333333,mmol gDCW^-1 h^-1,D-glucose,10,closed
+Maximum ATP production,20.833333,14.166667,mmol gDCW^-1 h^-1,D-glucose,10,closed
+Maximum biomass production,0.251959,0.169333,h^-1,D-glucose,10,closed

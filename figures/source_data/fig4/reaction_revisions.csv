@@ -1,0 +1,5 @@
+module,reaction_id,initial_constraint,final_constraint,evidence
+Reducing equivalents,FDR,reversible,closed,"charge imbalance: +1"
+Reducing equivalents,ABAH,reversible,closed,"H imbalance: -2; O imbalance: +1"
+Energy,EX_h_e,"[-10, 1000]","[0, 1000]","proton-exchange direction corrected"
+Net metabolite production,MADH,forward,closed,"charge imbalance: -2; C imbalance: +1; O imbalance: +3"

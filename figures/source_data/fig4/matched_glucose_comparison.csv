@@ -1,0 +1,4 @@
+metric,pre_mqc,post_mqc,unit,carbon_source,uptake_bound,other_carbon_sources
+NADH capacity,520.555556,18.333333,mmol gDCW^-1 h^-1,D-glucose,-10,closed
+ATP capacity,20.833333,14.166667,mmol gDCW^-1 h^-1,D-glucose,-10,closed
+Biomass,0.251959,0.169333,h^-1,D-glucose,-10,closed

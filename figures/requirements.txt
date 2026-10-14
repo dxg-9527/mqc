@@ -1,0 +1,10 @@
+matplotlib==3.8.4
+numpy==1.26.4
+openpyxl==3.1.2
+pandas==2.2.2
+pypdf==5.7.0
+PyMuPDF==1.27.2.2
+cobra==0.30.0
+python-pptx==1.0.2
+Pillow==12.1.1
+lxml==5.2.1
