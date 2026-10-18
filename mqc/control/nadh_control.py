@@ -239,7 +239,7 @@ class Nadhs:
                     print(model.slim_optimize(), "...............")
                     if need_add_rxn:
                         for rxnId in need_add_rxn:
-                            bounds = model.reactions.get_by_id(ids).bounds
+                            bounds = model.reactions.get_by_id(rxnId).bounds
                             model.reactions.get_by_id(rxnId).bounds = (0, 0)
                             if (
                                 model.slim_optimize() < 1e-6

@@ -60,7 +60,7 @@ class ModelPreprocess:
 
         """
         seed_met, meta_met, virtual_met, kegg_met, other_met = [], [], [], [], []
-        pattern = r"^C\d{5}$"
+        pattern = r"^C\d{5}(?:_[cep]\d*)?$"
         for met in obj.model.metabolites:
             if met.id.startswith("cpd"):
                 seed_met.append(met.id)
@@ -141,6 +141,10 @@ class ModelPreprocess:
 
     def get_identifier(self, obj):
         """"""
+        if not obj.model.metabolites:
+            return 'other'
+        if sum(bool(re.fullmatch(r'C\d{5}(?:_[cep]\d*)?', m.id)) for m in obj.model.metabolites) / len(obj.model.metabolites) > 0.8:
+            return 'kegg'
         identifier, count = "", 0
         for met in obj.model.metabolites:
             if met.id.startswith("cpd"):
@@ -378,16 +382,33 @@ class ModelPreprocess:
         self.remove_not_in_rxn_met(controler)
         self.remove_no_met_rxn(controler)
         self.preprocess_met(controler)
+        from mqc.control.metabolite_chemistry import repair_known_charges
+        charge_errata = repair_known_charges(controler.model)
+        check_charge_errata = repair_known_charges(controler.check_model)
         self.modify_met_formula(controler)
         self.modify_met_name(controler)
         self.preprocess_rxn(controler)
+        native_identifier = self.get_identifier(controler)
+        from mqc.control.flavodoxin_identity import repair_model as repair_flavodoxin
+        flavodoxin_repairs = repair_flavodoxin(controler.model)
+        check_flavodoxin_repairs = repair_flavodoxin(controler.check_model)
+        electron_repairs = []
+        if getattr(self.cfg, 'repair_single_electron_templates', True):
+            from mqc.control.electron_stoichiometry import repair_preprocessed_pair
+            electron_repairs = repair_preprocessed_pair(
+                controler.model, controler.check_model)
         self.model_info = {
             "model_id": controler.model.id,
-            "model_identifier": self.get_identifier(controler),
+            "model_identifier": native_identifier,
             "metabolites": self.get_met_info(controler),
             "reactions": self.get_rxn_info(controler),
         }
         self.model_info["initial_rxn"] = self.get_initial_obj_info(controler)
+        self.model_info['electron_stoichiometry_preprocessing'] = electron_repairs
+        self.model_info['metabolite_charge_errata'] = charge_errata
+        self.model_info['check_model_charge_errata'] = check_charge_errata
+        self.model_info['flavodoxin_identity_preprocessing'] = flavodoxin_repairs
+        self.model_info['check_model_flavodoxin_identity'] = check_flavodoxin_repairs
         self.model_info["all_rxn_id"] = [rxn.id for rxn in controler.model.reactions]
         self.model_info["exchange_rxns"] = self.get_exchange_rxns()
         self.model_info["transport_rxns"] = self.get_transport_rxns()

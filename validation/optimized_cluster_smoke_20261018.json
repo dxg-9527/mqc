@@ -1,0 +1,56 @@
+{
+  "release": "optimized-20261018",
+  "purpose": "Local runner and packaging validation, not a cohort-wide biological improvement claim",
+  "cluster_jobs_submitted": 0,
+  "core_reference_files_matching_frozen_optimized_source": 47,
+  "frozen_optimized_source_lock_sha256": "4b47e3654eac47ea327baf2af168ee1cbff405257900c8a116c1b66e2221ae02",
+  "release_lock_sha256": "d70f17dd4bb28491f86b2c8855853ef13a55d6facdd1a787950e9a278504f876",
+  "python38_runner_tests_passed": 8,
+  "python38_entrypoint_and_reference_tests_passed": 4,
+  "wheel_core_hash_checks_passed": 47,
+  "full_plan": {
+    "models": 6543,
+    "array_slots": 1000,
+    "maximum_models_per_slot": 7,
+    "parallel_limit": 32,
+    "submitted": false
+  },
+  "smoke": {
+    "model": "BiGG:e_coli_core",
+    "input_xml_sha256": "0e8cf31f925e9eb71e502a4ec32b67713b122c357d35ac2e9096bf61b1ba4db5",
+    "environment_python": "3.8.16",
+    "cplex": "22.1.0.0",
+    "container_cpu_limit": 4,
+    "container_memory_limit_GiB": 4,
+    "mode": "model_check2_only",
+    "completed_stages": 6,
+    "status": "completed",
+    "wall_seconds": 301.7091999053955,
+    "postgap_status": "passed",
+    "final_model_sha256": "bcf7d6f1b704161f54b75ae82287fca708292de7019111a8bf4e81d765d3bc4e",
+    "final_reactions": 124,
+    "final_metabolites": 95,
+    "final_objective_value": 1.212157127223819,
+    "final_pfba_max_abs_Sv": 1.2434497875801753e-14,
+    "final_pfba_max_bound_violation": 1.4210854715202004e-14,
+    "archive_sha256": "0e739905ba26fcb0dd9aa985d7abb96f78f631c2b8f6a5a5e9c4a468ba2f17c2",
+    "archive_bytes": 2238775,
+    "required_archive_entries_verified": true,
+    "verified_completed_skip_test": "passed",
+    "five_return_archive_checksums": "passed",
+    "runner_release_lock_at_smoke": "acc82c3bedab2134984e9e0d007a4f12f020fa25f520d29177277bb6c9d06ef7"
+  },
+  "post_smoke_runner_changes": {
+    "files": ["cluster/check_environment.py", "cluster/test_tools.py"],
+    "description": "Added rejection of a non-CPLEX COBRA default solver and its regression test; scientific core, run_model, worker and collect unchanged",
+    "final_environment_guard_with_validated_cplex": "passed",
+    "final_environment_guard_wrong_solver_regression": "passed"
+  },
+  "limits": [
+    "No real Slurm submission, cluster partition, account, quota or queue time verified locally",
+    "One smoke model cannot estimate runtime distribution or demonstrate overall biological improvement",
+    "Synthetic failure tests are runner mechanics only",
+    "Smoke git commit unavailable inside the read-only worktree container; source and runner hashes retained",
+    "Frozen source whitespace retained to preserve exact byte identity"
+  ]
+}

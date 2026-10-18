@@ -27,7 +27,6 @@ class Check:
             need_fluxes = {}
 
         for ids, v in need_fluxes.items():
-            v = round(v, 5)
             rxns = model.reactions.get_by_id(ids)
             all_mets = [met.id for met in rxns.metabolites]
             all_mets_name = [met.name for met in rxns.metabolites]
@@ -46,7 +45,7 @@ class Check:
                     or mets.formula == "null"
                 ):
                     return all_mets[0]
-                result += v * relative_molecular_mass(model, all_mets[0])
+                result -= v * rxns.get_coefficient(all_mets[0]) * relative_molecular_mass(model, all_mets[0])
         try:
             final = abs(result / model.slim_optimize())
         except ZeroDivisionError:

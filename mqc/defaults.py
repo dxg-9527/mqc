@@ -1096,7 +1096,6 @@ AC = ["ac", "Acetate", "acetate", "Acetate-c0", "Acetate-e0"]
 NADH_NAME = [
     "nadh",
     "NADH",
-    "NADP(+)",
     "Nicotinamide adenine dinucleotide - reduced",
     "NADH-c0",
     "NADH_c0",

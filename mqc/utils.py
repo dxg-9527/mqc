@@ -15,6 +15,7 @@ from logging.handlers import TimedRotatingFileHandler
 from mqc.defaults import *
 from mqc.mqcpath_visualization import *
 from mqc.control.rules_control2 import Rules2
+from mqc.control.growth_environment import input_closed_bounds
 
 
 def add_rxn(model, rxn_name, rxn_expression):
@@ -100,59 +101,35 @@ def add_atpm_rxn(model, xTP, xDP):
 
 
 def add_nadh_rxn(model):
+    """Use the same NADH diagnostic half-reaction at every call site.
+
+    This artificial electron drain is not an enzyme or a gap-filling candidate:
+    NADH -> NAD+ + H+, with two electrons removed implicitly by the diagnostic.
     """
-    Add nadh reaction to model.
-
-    Parameters
-    ----------
-    model : cobra.Model
-
-    Return
-    ------
-    cobra.Model
-        Model after adding nadh
-
-    """
-    nadh_list, h_list, nad_list = [], [], []
-    for met in model.metabolites:
-        if met.name in NADH_NAME and met.compartment in C_COMPARTMENT:
-            nadh_list.append(met.id)
-        if met.name in H_NAME and met.compartment in C_COMPARTMENT:
-            h_list.append(met.id)
-        if met.name in NAD_NAME and met.compartment in C_COMPARTMENT:
-            nad_list.append(met.id)
-    nadh_c = select_more_met(model, nadh_list)
-    h_c = select_more_met(model, h_list)
-    nad_c = select_more_met(model, nad_list)
-    if not nadh_c or not h_c or not nad_c:
-        return ""
-    rxn_name = "ADD_NADH"
-    rxn_exp = "{} + {} --> {}".format(nadh_c, h_c, nad_c)
-    print(rxn_name, rxn_exp)
-    add_rxn(model, rxn_name, rxn_exp)
-    return rxn_name
+    return get_other_nadh_rxn(model, NADH_NAME, NAD_NAME, H_NAME, "NADH")
 
 
 def get_other_nadh_rxn(model, rea, pro1, pro2, name):
     """"""
     nadh_list, h_list, nad_list = [], [], []
     for met in model.metabolites:
-        if met.name in rea and met.compartment in C_COMPARTMENT:
-            nadh_list.append(met.id)
-        if met.name in pro1 and met.compartment in C_COMPARTMENT:
-            h_list.append(met.id)
-        if met.name in pro2 and met.compartment in C_COMPARTMENT:
-            nad_list.append(met.id)
+        if met.name in rea and met.compartment in C_COMPARTMENT: nadh_list.append(met.id)
+        if met.name in pro1 and met.compartment in C_COMPARTMENT: h_list.append(met.id)
+        if met.name in pro2 and met.compartment in C_COMPARTMENT: nad_list.append(met.id) 
     nadh_c = select_more_met(model, nadh_list)
     h_c = select_more_met(model, h_list)
     nad_c = select_more_met(model, nad_list)
     if not nadh_c or not h_c or not nad_c:
-        return ""
+        return ''
     rxn_name = f"ADD_{name}"
-    rxn_exp = "{} --> {} + {}".format(nadh_c, h_c, nad_c)
-    print(rxn_name, rxn_exp)
+    # pro1 is the oxidized carrier; pro2 is H+. Pyridine nucleotides
+    # release one proton per two electrons, flavins and quinols release two.
+    # These are formal diagnostic drains, not automatic enzyme corrections.
+    proton_count = 2 if name in {"FADH2", "FMNH2", "Q8H2", "MQL8", "DMMQL8"} else 1
+    rxn_exp = "{} --> {} + {} {}".format(nadh_c, h_c, proton_count, nad_c)
+    print(rxn_name,rxn_exp)
     add_rxn(model, rxn_name, rxn_exp)
-    return rxn_name
+    return rxn_name 
 
 
 def first_get_biomass_rxn(model, initial_rxn_id):
@@ -362,7 +339,59 @@ def set_initial_obj2(model, rxnId):
         return rxnId
 
 
-def add_demand(modelInfo, model, metId):
+def carbon_name_matches(name, preferred, reaction):
+    """Match a legacy name, optionally suffixed by its exact stored formula.
+
+    No substring or reaction-ID matching: maltose phosphate, maltotriose and
+    chemically inconsistent suffixes must not become maltose candidates.
+    """
+    normalized = ' '.join(str(name).split()).casefold()
+    preferred = preferred.casefold()
+    if normalized == preferred:
+        return True
+    if len(reaction.metabolites) != 1:
+        return False
+    met = next(iter(reaction.metabolites))
+    return bool(met.formula and normalized == preferred + ' ' + met.formula.casefold())
+
+def _write_model_with_current_objective(model, cfg:object, file_path:str):
+    """"""
+    try:
+        if file_path.endswith(".json"):
+            final_model = f"{cfg.output_dir}/{model}.json"
+            print('test',final_model)
+            cobra.io.save_json_model(model,final_model)
+        elif file_path.endswith(".yaml"):
+            final_model = f"{cfg.output_dir}/{model}.yaml"
+            cobra.io.save_yaml_model(model,final_model)
+        elif file_path.endswith(".mat"):
+            final_model = f"{cfg.output_dir}/{model}.mat"
+            cobra.io.save_matlab_model(model,final_model)
+        else:
+            final_model = f"{cfg.output_dir}/{model}.xml"
+            print('test',final_model)
+            # model2 = cobra.io.read_sbml_model("/home/dengxiao/mqc/tmp/other/iCac802_norm2/COBRAModel.xml")
+            # print('test',final_model)
+            # r1,r2=[],[]
+            # for rxn in model.reactions:
+            #     r1.append(rxn.id)
+            #     for rxn2 in model2.reactions:
+            #         r2.append(rxn2.id)
+            #         if rxn.id == rxn2.id:
+            #             if rxn.bounds!=rxn2.bounds:
+            #                 print(rxn.id,rxn.bounds,rxn2.bounds)
+            # print('ttttt')
+            # print([k for k in r1 if k not in list(set(r2))],'xxx')
+            # print([k for k in list(set(r2)) if k not in r1],'zzz')
+            cobra.io.write_sbml_model(model,final_model)
+    except:
+        final_model = f"{cfg.output_dir}/{model}.json"
+        print('test',final_model)
+        cobra.io.save_json_model(model,final_model )
+    print('刚写下的模型生长速率:',model.slim_optimize(),'............')
+    return final_model
+
+def add_demand(modelInfo, model, metId, independent=False):
     """
     Add demand reaction.
 
@@ -372,6 +401,9 @@ def add_demand(modelInfo, model, metId):
         Information about the model
     metId : str
         The metabolite ID that needs to be added to the demand reaction
+    independent : bool
+        Test precursor availability with a separate drain, keeping all existing
+        supply boundaries intact. Default callers retain net-production logic.
 
     Notes
     -----
@@ -379,28 +411,31 @@ def add_demand(modelInfo, model, metId):
 
     """
     mets = model.metabolites.get_by_id(metId)
-    flag, objectiveId = 0, ""
+    if independent:
+        # One net flux variable cannot import a precursor and export it as
+        # the test objective simultaneously. Never reopen an existing drain.
+        demand_id, suffix = f"DM_{metId}", 0
+        while demand_id in model.reactions:
+            reaction = model.reactions.get_by_id(demand_id)
+            if dict(reaction.metabolites) == {mets: -1} and reaction.bounds == (0, 1000):
+                return demand_id
+            suffix += 1
+            demand_id = f"DM_{metId}_mqc_{suffix}"
+        return model.add_boundary(mets, type='demand', reaction_id=demand_id,
+                                  lb=0, ub=1000).id
+    flag, objectiveId = 0, ''
     for rxn in modelInfo["reactions"]:
-        rxns = model.reactions.get_by_id(rxn["id"])
+        rxns = model.reactions.get_by_id(rxn['id'])
         all_mets = [met.id for met in rxns.metabolites]
-        if (
-            metId in all_mets
-            and len(all_mets) == 1
-            and (
-                (rxn["reactants_mets"] and rxn["bounds"][1] > 0)
-                or (rxn["products_mets"] and rxn["bounds"][0] < 0)
-            )
-        ):
+        if metId in all_mets and len(all_mets) == 1 and ((rxn['reactants_mets'] and rxn["bounds"][1] > 0) or (rxn['products_mets'] and rxn['bounds'][0] < 0)):
             objectiveId = rxn["id"]
             flag += 1
     if flag == 0:
-        if f"DM_{metId}" in modelInfo["all_rxn_id"]:
+        if f"DM_{metId}" in modelInfo["all_rxn_id"]: # if 'DM_' + metId in modelInfo["all_rxn_id"]:TypeError: can only concatenate str (not "Metabolite") to str
             objectiveId = f"DM_{metId}"
         else:
             try:
-                demand_rxn = model.add_boundary(
-                    mets, type="demand"
-                )  # Add a demand reaction.
+                demand_rxn = model.add_boundary(mets, type = 'demand') # 添加demand反应
                 objectiveId = demand_rxn.id
             except:
                 objectiveId = f"DM_{metId}"
@@ -583,15 +618,15 @@ def max_reduced_degree_rate(model, metId, model_info):
 
 
 def get_biomass_adp_coefficient(model, model_info):
-    """"""
-    initial_rxn_id = model_info["initial_rxn"]["biomass_rxn_id"]
+    """Record an unambiguous original ADP coefficient; missing is not zero."""
+    initial = model_info["initial_rxn"]
+    initial["adp_coefficient"] = None
+    initial_rxn_id = initial["biomass_rxn_id"]
     if initial_rxn_id:
         rxns = model.reactions.get_by_id(initial_rxn_id)
-        for met in rxns.metabolites:
-            if met.name in ADP_NAME:
-                adp_met = met.id
-        atp_coefficient = rxns.metabolites[model.metabolites.get_by_id(adp_met)]
-        model_info["initial_rxn"]["adp_coefficient"] = atp_coefficient
+        adp_mets = [met for met in rxns.metabolites if met.name in ADP_NAME]
+        if len(adp_mets) == 1:
+            initial["adp_coefficient"] = rxns.get_coefficient(adp_mets[0].id)
 
 
 def find_autotrophic_and_carbon_source(model_info, model):
@@ -667,36 +702,25 @@ def is_autotrophic(model_info):
 
 def find_other_carbon_source(model_info, model):
     """"""
-    carbon_rxnId, carbon_met = "", [
-        "sucrose",
-        "maltose",
-        "starch",
-        "xylose",
-        "glycrole",
-        "glycerol",
-    ]  # Preferred alternatives include sucrose, maltose, starch, xylose and glycerol.
+    carbon_rxnId, carbon_met = '', ['sucrose','maltose','starch','xylose','glycrole','glycerol'] # 蔗糖、麦芽糖、淀粉、木糖、甘油
     for carbon_met_name in carbon_met:
         for rxn in model_info["reactions"]:
-            if (
-                rxn["id"] in model_info["exchange_rxns"]
-                and carbon_met_name == rxn["all_mets"][0].lower()
-            ):
-                carbon_rxnId = rxn["id"]
+            if (rxn['id'] in model_info['exchange_rxns'] and rxn['id'] in model.reactions
+                    and rxn['all_mets'] and carbon_name_matches(rxn['all_mets'][0], carbon_met_name,
+                                                              model.reactions.get_by_id(rxn['id']))):
+                carbon_rxnId = rxn['id']
                 break
         if carbon_rxnId:
             break
     if carbon_rxnId:
         return carbon_rxnId
-    for num in [6, 5, 3, 2]:
+    for num in [6,5,3,2]:
         for rxns in model.reactions:
-            if rxns.id in model_info["exchange_rxns"]:
+            if rxns.id in model_info['exchange_rxns']:
                 met = [met for met in rxns.metabolites][0]
-                if (
-                    len(set(met.elements.keys()) & set((["C", "H", "O"]))) == 3
-                    and met.elements["C"] == num
-                ):
+                if len(set(met.elements.keys()) & set((['C','H','O']))) == 3 and met.elements['C'] == num:
                     carbon_rxnId = rxns.id
-                    break
+                    break 
         if carbon_rxnId:
             break
     return carbon_rxnId
@@ -1869,28 +1893,21 @@ def del_h2(model_info, model, check_model):
 
 
 def close_h2_ppt_tsul(model_info, model):
-    """"""
+    """Close designated inputs without blocking fermentative product release."""
     for rxn in model.reactions:
         if len(rxn.metabolites) == 1:
             mets = list(rxn.metabolites.keys())[0]
-            if mets.name in H2_NAME or mets.id in H2:
-                rxn.bounds = (0, 0)
-                model_info["modify_rxn"].append(rxn.id)
-                model_info["special_boundary_reaction"].extend(
-                    [f"Close the input of h2:{rxn}"]
-                )
-            if mets.name in PPT_NAME or mets.id in PPT:
-                rxn.bounds = (0, 0)
-                model_info["modify_rxn"].append(rxn.id)
-                model_info["special_boundary_reaction"].extend(
-                    [f"Close the input of ppt:{rxn}"]
-                )
-            if mets.name in TSUL_NAME or mets.id in TSUL:
-                rxn.bounds = (0, 0)
-                model_info["modify_rxn"].append(rxn.id)
-                model_info["special_boundary_reaction"].extend(
-                    [f"Close the input of tsul:{rxn}"]
-                )
+            label = ("h2" if mets.name in H2_NAME or mets.id in H2 else
+                     "ppt" if mets.name in PPT_NAME or mets.id in PPT else
+                     "tsul" if mets.name in TSUL_NAME or mets.id in TSUL else None)
+            if label:
+                before = rxn.bounds
+                rxn.bounds = input_closed_bounds(rxn)
+                if before != rxn.bounds:
+                    if rxn.id not in model_info['modify_rxn']:
+                        model_info['modify_rxn'].append(rxn.id)
+                    model_info["special_boundary_reaction"].append(
+                        f"Close the input of {label}, retain permitted secretion: {rxn.id}, {before} -> {rxn.bounds}")
 
 
 def set_special_boundary_rxn(model_info, model, check_model):
@@ -2973,30 +2990,19 @@ def write_result4(model_control_info, cfg: object):
     return cfg.result_file4
 
 
-def write_final_model(model, cfg: object, file_path: str):
-    """"""
-    try:
-        if file_path.endswith(".json"):
-            final_model = f"{cfg.output_dir}/{model}.json"
-            print("test", final_model)
-            cobra.io.save_json_model(model, final_model)
-        elif file_path.endswith(".yaml"):
-            final_model = f"{cfg.output_dir}/{model}.yaml"
-            cobra.io.save_yaml_model(model, final_model)
-        elif file_path.endswith(".mat"):
-            final_model = f"{cfg.output_dir}/{model}.mat"
-            cobra.io.save_matlab_model(model, final_model)
-        else:
-            final_model = f"{cfg.output_dir}/{model}.xml"
-            print("test", final_model)
+def write_final_model(model, cfg:object, file_path:str, biomass_rxn_id=None):
+    """Export an explicit biomass objective when producing a final QC model.
 
-            cobra.io.write_sbml_model(model, final_model)
-    except:
-        final_model = f"{cfg.output_dir}/{model}.json"
-        print("test", final_model)
-        cobra.io.save_json_model(model, final_model)
-    print("Growth rate after model export:", model.slim_optimize(), "............")
-    return final_model
+    Intermediate diagnostic exports keep their current objective by default.
+    An explicitly requested missing biomass reaction is an error, not a reason
+    to silently export a diagnostic demand as growth.
+    """
+    if biomass_rxn_id is None:
+        return _write_model_with_current_objective(model, cfg, file_path)
+    with model:
+        model.objective = model.reactions.get_by_id(biomass_rxn_id)
+        model.objective_direction = "max"
+        return _write_model_with_current_objective(model, cfg, file_path)
 
 
 def read_model(model_path):

@@ -5,6 +5,7 @@ import re
 from mqc.defaults import *
 from ..utils import add_rxn
 from mqc.config import Config
+from mqc.control.formula_charge_pairing import missing_input_charges, complete_reference_pair
 
 
 class Preprocess:
@@ -48,6 +49,8 @@ class Preprocess:
         except:
             self.model = ""
             return None
+        self._input_charge_missing = missing_input_charges(file_path, self.model)
+        missing_input_charges(file_path, self.check_model)
 
     def add_meta_formula(self, meta_met):
         """
@@ -213,77 +216,70 @@ class Preprocess:
 
     def change_virtual_to_bigg(self, virtual_met):
         """Convert bracketed compartment suffixes to underscore-separated identifiers."""
-        for metId in virtual_met:
-            met = self.model.metabolites.get_by_id(metId)
-            met.id = re.sub(r"\[(.*?)\]", r"_\1", metId)
+        for target in (self.model, self.check_model):
+            for metId in virtual_met:
+                if metId in target.metabolites:
+                    new_id = re.sub(r"\[(.*?)\]", r"_\1", metId)
+                    if new_id in target.metabolites:
+                        raise ValueError('Conflicting bracket/underscore identities: ' + metId)
+        for target in (self.model, self.check_model):
+            for metId in virtual_met:
+                if metId in target.metabolites:
+                    target.metabolites.get_by_id(metId).id = re.sub(r"\[(.*?)\]", r"_\1", metId)
 
     def add_kegg_formula(self, kegg_met):
         """Add formula to kegg"""
-        kegg_met = pd.read_excel(self.cfg.kegg_met)
-        kegg_formula = dict(zip(kegg_met["id"], kegg_met["formula"]))
-        kegg_name = dict(zip(kegg_met["id"], kegg_met["name"]))
-        kegg_charge = dict(zip(kegg_met["id"], kegg_met["charge"]))
+        table = pd.read_excel(self.cfg.kegg_met)
+        kegg_formula = dict(zip(table["id"], table["formula"]))
+        kegg_name = dict(zip(table["id"], table["name"]))
+        kegg_charge = dict(zip(table["id"], table["charge"]))
         for metId in kegg_met:
-            if metId in list(kegg_met["id"]):
+            reference_id = metId.split('_')[0]
+            if reference_id in kegg_formula:
                 met = self.model.metabolites.get_by_id(metId)
-                met.name = kegg_name[metId]
+                met.name = kegg_name[reference_id]
                 if met.formula and met.formula != "X":
                     met.formula = re.sub(self.pattern, "", met.formula)
                 else:
-                    met.formula = str(kegg_formula[metId])
+                    met.formula = str(kegg_formula[reference_id])
                 if met.charge:
                     pass
                 else:
-                    if not pd.isna(kegg_charge[metId]):
-                        met.charge = int(kegg_charge[metId])
+                    if not pd.isna(kegg_charge[reference_id]):
+                        met.charge = int(kegg_charge[reference_id])
 
     def add_other_formula(self, other_met):
         """Add formula to metacyc"""
         bigg_metacyc_met = pd.read_excel(self.cfg.bigg_metacyc)
-        bigg_metacyc_formula = dict(
-            zip(bigg_metacyc_met["id"], bigg_metacyc_met["formula"])
-        )
-        bigg_metacyc_charge = dict(
-            zip(bigg_metacyc_met["id"], bigg_metacyc_met["charge"])
-        )
-        bigg_metacyc_name = dict(zip(bigg_metacyc_met["id"], bigg_metacyc_met["name"]))
+        bigg_metacyc_formula = dict(zip(bigg_metacyc_met['id'], bigg_metacyc_met['formula']))
+        bigg_metacyc_charge = dict(zip(bigg_metacyc_met['id'], bigg_metacyc_met['charge']))
+        bigg_metacyc_name = dict(zip(bigg_metacyc_met['id'], bigg_metacyc_met['name']))
         for metId in other_met:
             met = self.model.metabolites.get_by_id(metId)
-            if metId in list(
-                bigg_metacyc_met["id"]
-            ):  # Fill missing formulas using the reference identifier table.
+            charge_missing = metId in self._input_charge_missing
+            if metId in list(bigg_metacyc_met['id']):      # 代谢物ID在总表里面，就可以对formula进行添加
                 met.name = bigg_metacyc_name[metId]
-                if (
-                    met.formula and met.formula != "X"
-                ):  # Normalize an existing formula before retaining it.
+                if met.formula and met.formula != 'X': # formula存在时检测是否有问题
                     met.formula = re.sub(self.pattern, "", met.formula)
                 else:
                     met.formula = str(bigg_metacyc_formula[metId])
-                if met.charge:
-                    pass
-                else:
-                    if not pd.isna(bigg_metacyc_charge[metId]):
-                        met.charge = int(bigg_metacyc_charge[metId])
-            else:  # Remove unresolved polymer-repeat suffixes when no reference formula is available.
-                if met.formula and met.formula != "X":
-                    met.formula = re.sub(self.pattern, "", met.formula)
+                if charge_missing:
+                    charge_missing = not complete_reference_pair(
+                        met, bigg_metacyc_formula[metId], bigg_metacyc_charge[metId])
+            else:  # 代谢物ID不在总表里面，需要对formula进行检测，将'C10H17O8PR2(C5H8O5PR)n'这种不合法formula变为'C10H17O8PR2'
+                if met.formula and met.formula != 'X':
+                    met.formula = re.sub(self.pattern, "", met.formula)     
             if not met.formula:
-                for ids in list(bigg_metacyc_met["id"]):
-                    if (
-                        metId.replace("_", "") == ids.replace("_", "")
-                        and ids.count("_") == metId.count("_") + 1
-                    ):
-                        if "__" in ids:
+                for ids in list(bigg_metacyc_met['id']):
+                    if metId.replace('_', '') == ids.replace('_', '') and ids.count('_') == metId.count('_') + 1:
+                        if '__' in ids:
                             met.formula = str(bigg_metacyc_formula[ids])
-            if not met.charge:
-                for ids in list(bigg_metacyc_met["id"]):
-                    if (
-                        metId.replace("_", "") == ids.replace("_", "")
-                        and ids.count("_") == metId.count("_") + 1
-                    ):
-                        if "__" in ids:
-                            if not pd.isna(bigg_metacyc_charge[ids]):
-                                met.charge = int(bigg_metacyc_charge[ids])
+            if charge_missing:
+                for ids in list(bigg_metacyc_met['id']):
+                    if metId.replace('_', '') == ids.replace('_', '') and ids.count('_') == metId.count('_') + 1:
+                        if '__' in ids:
+                            if complete_reference_pair(met, bigg_metacyc_formula[ids], bigg_metacyc_charge[ids]):
+                                break
             if not met.compartment:
-                met.compartment = metId.split("_")[-1]
-                print(met.id, "add_other_formula.................", met.compartment)
+                met.compartment = metId.split('_')[-1]
+                print(met.id,'add_other_formula.................',met.compartment)

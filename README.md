@@ -1,24 +1,42 @@
 # MQC
 
+## Optimized cluster validation release
+
+Branch `optimized-20261018` contains the frozen optimized correction implementation
+and a portable Slurm batch runner. It does not replace the AWS deployment or the
+original `main` branch. The `mqc/` source and reference data are byte-identical to
+the optimized version used in the final three-strain local verification; their
+hashes are recorded in `cluster/release_lock.json`.
+
+See [the Chinese cluster guide](cluster/README_zh.md) for model transfer,
+environment checks, array submission, failed-job retry, and return files.
+The runner invokes correction only, without a detection pre-run, and preserves
+stage models, flux tables, final exports, failures and version provenance.
+The planned 6,543-model cluster validation has not yet been completed.
+Local runner tests and a complete e_coli_core correction/export smoke run are
+recorded in [the release validation](validation/optimized_cluster_smoke_20261018.json).
+
 MQC detects quantitative defects in genome-scale metabolic models and supports
 automated reaction and biomass curation. Detection can be run independently of
 correction. The five diagnostic modules assess reducing-equivalent production,
 energy production, net-metabolite production, metabolite yields and biomass
 synthesis.
 
-This repository contains the MQC runtime used by the web workflow, its required
+This branch contains the optimized MQC runtime derived from the web workflow, its required
 reference tables and reaction libraries, and the programs and data for the
 manuscript figures. The web interface is available at
 <https://mqc.biodesign.ac.cn/>.
 
 ## Install
 
-Use a dedicated Python environment. The core package supports Python 3.8 or later;
-Python 3.10 or later is recommended for new environments.
+Use a dedicated Python environment. The package metadata supports Python 3.8 or
+later, but this batch comparison uses Python 3.8.16 and the pinned dependencies
+in `cluster/requirements-validated.txt`. Follow the cluster guide for this study;
+the generic installation below does not reproduce its validated environment.
 
 ```bash
-git clone https://github.com/dxg-9527/mqc.git
-cd mqc
+git clone --branch optimized-20261018 --single-branch https://github.com/dxg-9527/mqc.git mqc-optimized
+cd mqc-optimized
 python -m pip install .
 ```
 
@@ -63,13 +81,12 @@ gap-filling models are written when required by the workflow.
 The `ModelCheck` and `ModelControl` classes are retained for applications that use
 the web workflow's report and reaction-editing interfaces.
 
-The deployed biomass-correction workflow currently expects an ADP term in the
-biomass reaction. Models without that term can stop during correction; detection
-mode remains available for inspecting their diagnostic results.
+Unsupported input structures or unresolved correction failures are retained in
+the batch failure report, rather than counted as successful correction.
 
 ## Publication figures
 
-The `figures/` directory contains the current six figures, 41 standalone panels
+The `figures/` directory retains the historical six figures, 41 standalone panels
 for Figures 2-6, plotting inputs and their regeneration programs. See
 [the figure instructions](figures/README.md) for dependencies and commands.
 Regeneration uses the archived numerical inputs; it does not rerun metabolic
@@ -82,12 +99,16 @@ model correction. Figure 1 is supplied as the approved framework artwork.
 - `figures/`: figure programs, source tables, full figures and panels.
 - `tests/`: installation, entry-point and packaged-resource checks.
 
-The standalone entry point follows the deployed web workflow, including model
-serialization and reloading between correction modules. Package-relative paths
-allow execution outside the repository directory. Duplicate launchers, local
-batch jobs and commented-out code are excluded.
+The optimized workflow retains model serialization and reloading between
+correction modules. Package-relative paths allow execution outside the repository
+directory. Cluster tools live in `cluster/` and run correction without a detection pre-run.
 
 ## Validation
+
+The AWS equivalence records below describe the original public baseline, not
+the optimized branch. Optimized outputs are expected to differ from that
+baseline. The cluster runner preserves both successful and unsuccessful cases
+for comparison with the manuscript's historical corrected-model cohort.
 
 A paired iCN718 run reproduced the deployed AWS implementation's detection
 outputs, correction report, model metadata and final models. The corrected and
@@ -99,7 +120,7 @@ Both runs also reproduced an existing SBML export issue: two generated
 metabolites have empty compartment identifiers, so the final XML cannot be
 reopened by COBRApy. The accompanying `iCN718.json` files load successfully and
 have identical model structure and a biomass objective value of 0.0. Use the JSON
-output for this case. The release preserves this deployed behavior.
+output for this case. Those observations apply to the original baseline release.
 
 ## License
 

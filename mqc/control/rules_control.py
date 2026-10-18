@@ -5,19 +5,145 @@ from mqc.defaults import *
 from mqc.config import Config
 
 
+_RESPIRATORY_AUXILIARIES = frozenset(s.lower() for s in
+    H_NAME + H2O_NAME + O2_NAME + O2S + NA_NAME)
+_RESPIRATORY_CARRIERS = frozenset(s.lower() for s in
+    NAD_NAME + NADH_NAME + NADP + NADPH + Q8_NAME + Q8H2_NAME +
+    MQN7 + MQN8 + MQL7 + MQL8 + DMMQ8 + DMMQL8 + FAD + FADH2
+    if s.lower() not in {'acceptor', 'reduced acceptor'}) | frozenset(
+        ['qh2', '2dmmq7', 'cytochrome c2+', 'cytochrome c3+'])
+_RESPIRATORY_CARRIER_NAME = re.compile(
+    r'(?:ubiquin(?:one|ol)|menaquin(?:one|ol)|plastoquin(?:one|ol)|'
+    r'2-demethylmenaquin(?:one|ol))(?:[- ]?\d+|\(\d+\))?')
+
+
+def respiratory_membership_supported(names):
+    """Recognize whole metabolite names, not letters inside unrelated cargo.
+
+    In the old re.search expression h+ matched the letter h in phosphate,
+    methylbutanoate, etc.; na+ and cytochrome c3+ had the same syntax issue.
+    Reuse the existing cross-namespace aliases, with full-name matching for
+    quinone homologues. A proton-only transfer is not an electron chain.
+    This is a membership guard, not proof of thermodynamic irreversibility.
+    """
+    has_carrier = False
+    for name in names:
+        name = (name or '').strip().lower()
+        carrier = (name in _RESPIRATORY_CARRIERS or
+                   _RESPIRATORY_CARRIER_NAME.fullmatch(name) is not None)
+        if not carrier and name not in _RESPIRATORY_AUXILIARIES:
+            return False
+        has_carrier = has_carrier or carrier
+    return has_carrier
+
+
+def ammonia_assimilation_supported(consumed, produced):
+    """Support for NH3/NH4 assimilation, not a blanket direction exemption.
+
+    Retain the original substrates and recognize oxidation of a matching
+    NADH/NAD or NADPH/NADP pair. Reduced cofactor presence alone is insufficient;
+    cross-pairs and NAD(P)H production do not pay the reduction cost. Use the
+    existing metabolite aliases, not reaction IDs or a strain-specific list.
+    Other direction, balance and cycle rules remain active.
+    """
+    consumed, produced = set(consumed), set(produced)
+    return bool(consumed.intersection(SOLID_AMMONIA) or any(
+        consumed.intersection(reduced) and produced.intersection(oxidized)
+        for reduced, oxidized in [(NADH_NAME, NAD_NAME), (NADPH, NADP)]))
+
+
+def glutamate_synthesis_direction(record):
+    """Return the GOGAT synthesis sign, not a general transaminase direction.
+
+    Glutamine and 2-oxoglutarate are consumed on one side; glutamate is on
+    the other. A matching NAD(P)H or ferredoxin redox pair distinguishes
+    GOGAT from glutamine transaminases. Ambiguous same-side matches do not
+    establish a direction. Other balance/direction rules remain independent.
+    """
+    left, right = set(record['reactants_mets']), set(record['products_mets'])
+    for direction, consumed, produced in [(1, left, right), (-1, right, left)]:
+        if not (consumed.intersection(AKG_NAME) and consumed.intersection(GLUTAMINE)
+                and produced.intersection(GLUTAMATE)):
+            continue
+        if (consumed.intersection(GLUTAMATE) or produced.intersection(AKG_NAME)
+                or produced.intersection(GLUTAMINE)):
+            continue
+        for reduced, oxidized in [(NADH_NAME, NAD_NAME), (NADPH, NADP), (FDXRD, FDXO)]:
+            if (consumed.intersection(reduced) and produced.intersection(oxidized)
+                    and not consumed.intersection(oxidized)
+                    and not produced.intersection(reduced)):
+                return direction
+    return None
+
+
 class Rules:
     """
     Get all rule information
     """
 
+    def find_sugar_identity_conflicts(self, model_info, model):
+        from mqc.control.pathway_rules import sugar_identity_conflict, SUGAR_IDENTITY_RULE
+        findings = []
+        for record in model_info['reactions']:
+            finding = sugar_identity_conflict(model.reactions.get_by_id(record['id']))
+            if finding:
+                record['rules'][SUGAR_IDENTITY_RULE] = 'true'
+                findings.append(finding)
+        model_info['sugar_hydrolysis_identity_conflicts'] = findings
+
+    def find_biotin_synthesis_direction(self, model_info, model):
+        from mqc.control.biotin_direction import synthesis_direction, BIOTIN_RULE
+        if not getattr(self.cfg, 'biomass_rule_consistency', True):
+            return
+        for record in model_info['reactions']:
+            reaction = model.reactions.get_by_id(record['id'])
+            direction = synthesis_direction(reaction)
+            if ((direction == 1 and reaction.lower_bound < 0) or
+                    (direction == -1 and reaction.upper_bound > 0)):
+                record['rules'][BIOTIN_RULE] = 'true'
+
+    def find_deacetylase_direction(self, model_info, model):
+        from mqc.control.deacetylase_direction import deacetylase_direction, ACETATE_RULE
+        if not getattr(self.cfg, 'biomass_rule_consistency', True):
+            return
+        for record in model_info['reactions']:
+            reaction = model.reactions.get_by_id(record['id'])
+            direction = deacetylase_direction(reaction)
+            if ((direction == 1 and reaction.lower_bound < 0) or
+                    (direction == -1 and reaction.upper_bound > 0)):
+                record['rules'][ACETATE_RULE] = 'true'
+
     def __init__(self, cfg: Config):
         """"""
         self.cfg = cfg
+
+    def find_desulfurase_direction(self, model_info, model):
+        from mqc.control.desulfurase_direction import desulfuration_direction, DESULFURASE_RULE
+        if not getattr(self.cfg, 'biomass_rule_consistency', True):
+            return
+        for record in model_info['reactions']:
+            r = model.reactions.get_by_id(record['id'])
+            direction = desulfuration_direction(r)
+            if ((direction == 1 and r.lower_bound < 0) or
+                    (direction == -1 and r.upper_bound > 0)):
+                record['rules'][DESULFURASE_RULE] = 'true'
 
     def initial_rule(self, model_info):
         """"""
         for rxn in model_info["reactions"]:
             rxn["rules"] = {}
+
+    def find_incomplete_quinone_methylation(self, model_info, model):
+        from mqc.control.quinone_methylation import incomplete_methylation, METHYL_REDOX_RULE
+        if not getattr(self.cfg, 'biomass_rule_consistency', True):
+            return
+        findings = []
+        for record in model_info['reactions']:
+            finding = incomplete_methylation(model.reactions.get_by_id(record['id']))
+            if finding:
+                record['rules'][METHYL_REDOX_RULE] = 'true'
+                findings.append(finding)
+        model_info['incomplete_quinone_methylation'] = findings
 
     def find_o2s(self, model_info):
         """
@@ -198,7 +324,7 @@ class Rules:
                     len(set(NH4_NAME) & set(rxn["reactants_mets"])) != 0
                     or len(set(NH3_NAME) & set(rxn["reactants_mets"])) != 0
                 ):
-                    if len(set(SOLID_AMMONIA) & set(rxn["reactants_mets"])) == 0:
+                    if not ammonia_assimilation_supported(rxn["reactants_mets"], rxn["products_mets"]):
                         if (rxn["bounds"][0] < 0 and rxn["bounds"][1] > 0) or (
                             rxn["bounds"][0] == 0 and rxn["bounds"][1] > 0
                         ):
@@ -209,7 +335,7 @@ class Rules:
                     len(set(NH4_NAME) & set(rxn["products_mets"])) != 0
                     or len(set(NH3_NAME) & set(rxn["products_mets"])) != 0
                 ):
-                    if len(set(SOLID_AMMONIA) & set(rxn["products_mets"])) == 0:
+                    if not ammonia_assimilation_supported(rxn["products_mets"], rxn["reactants_mets"]):
                         if (rxn["bounds"][0] < 0 and rxn["bounds"][1] > 0) or (
                             rxn["bounds"][0] < 0 and rxn["bounds"][1] == 0
                         ):
@@ -857,24 +983,10 @@ class Rules:
     def find_glutamate_synthesis(self, model_info):
         """Identify reactions that do not follow the rules for glutamate synthesis"""
         for rxn in model_info["reactions"]:
-            if (
-                len(set(AKG_NAME) & set(rxn["products_mets"])) != 0
-                and len(set(GLUTAMINE) & set(rxn["products_mets"])) != 0
-                and len(set(GLUTAMATE) & set(rxn["products_mets"])) != 0
-            ):
-                if (rxn["bounds"][0] < 0 and rxn["bounds"][1] > 0) or (
-                    rxn["bounds"][0] == 0 and rxn["bounds"][1] > 0
-                ):
-                    rxn["rules"]["glutamate_synthesis_rxn"] = "true"
-            if (
-                len(set(AKG_NAME) & set(rxn["reactants_mets"])) != 0
-                and len(set(GLUTAMINE) & set(rxn["reactants_mets"])) != 0
-                and len(set(GLUTAMATE) & set(rxn["reactants_mets"])) != 0
-            ):
-                if (rxn["bounds"][0] < 0 and rxn["bounds"][1] > 0) or (
-                    rxn["bounds"][0] < 0 and rxn["bounds"][1] == 0
-                ):
-                    rxn["rules"]["glutamate_synthesis_rxn"] = "true"
+            direction = glutamate_synthesis_direction(rxn)
+            if ((direction == 1 and rxn["bounds"][0] < 0)
+                    or (direction == -1 and rxn["bounds"][1] > 0)):
+                rxn["rules"]["glutamate_synthesis_rxn"] = "true"
 
     def find_quino_rxn(self, model_info, model):
         """Find reactions that do not follow the rules for reactions of quinones"""
@@ -911,17 +1023,10 @@ class Rules:
 
     def find_respiratory_chain_rxn(self, model_info, model):
         """Get Respiratory Chain Reaction"""
-        k = 0
         for rxn in model_info["reactions"]:
-            for met in rxn["all_mets"]:
-                if not re.search(
-                    r"ubiquinol-\d|o2-|h+|ubiquinone-8|o2|nad|cytochrome c3+|nadh|cytochrome c2+|h2o|na+|qh2|mql7|menaquinone \d|menaquinol|menaquinol 8|menaquinol|plastoquinol|plastoquinone|2-demethylmenaquinone 8|2-demethylmenaquinol 8|2-demethylmenaquinol8|2dmmq7|fad",
-                    met.lower(),
-                ):
-                    k += 1
             rxns = model.reactions.get_by_id(rxn["id"])
             if (
-                k == 0
+                respiratory_membership_supported(rxn["all_mets"])
                 and len(set(rxn["reactants_mets"]) & set(H_NAME)) != 0
                 and len(set(rxn["products_mets"]) & set(H_NAME)) != 0
             ):
@@ -947,7 +1052,6 @@ class Rules:
                             rxn["rules"]["respiratory_chian_rxn"] = "true"
                         else:
                             rxn["rules"]["right_chain_rxn"] = "true"
-            k = 0
 
     def find_respiratory_chain_rxn2(self, model_info):
         """
@@ -969,112 +1073,17 @@ class Rules:
                     else:
                         rxn["rules"]["right_chain_rxn"] = "true"
 
-    def get_metacyc_rxn(
-        self, rxn, l_list, r_list, lower_dict, upper_dict, dfId, metName, met
-    ):
-        """"""
-        if len(set(metName) & set(rxn["reactants_mets"])) != 0:
-            if fnmatch.filter(l_list, f"*{met}_*"):
-                if (
-                    rxn["bounds"][0] != lower_dict[dfId]
-                    or rxn["bounds"][1] != upper_dict[dfId]
-                ):
-                    return 1
-            if fnmatch.filter(r_list, f"*{met}_*"):
-                if rxn["bounds"][0] != (~upper_dict[dfId] + 1) or rxn["bounds"][1] != (
-                    ~lower_dict[dfId] + 1
-                ):
-                    return 1
-        if len(set(metName) & set(rxn["products_mets"])) != 0:
-            if fnmatch.filter(r_list, f"*{met}_*"):
-                if (
-                    rxn["bounds"][0] != lower_dict[dfId]
-                    or rxn["bounds"][1] != upper_dict[dfId]
-                ):
-                    return 1
-            if fnmatch.filter(l_list, f"*{met}_*"):
-                if rxn["bounds"][0] != (~upper_dict[dfId] + 1) or rxn["bounds"][1] != (
-                    ~lower_dict[dfId] + 1
-                ):
-                    return 1
-        return 0
+    def get_metacyc_rxn(self, rxn, l_list, r_list, lower_dict, upper_dict, dfId, metName, met):
+        """Compatibility wrapper; all available anchors must agree."""
+        from mqc.control.metacyc_direction import reference_direction, violates
+        allowed, _, _ = reference_direction(rxn, lower_dict[dfId], upper_dict[dfId],
+                                             ' + '.join(l_list) + ' --> ' + ' + '.join(r_list))
+        return int(violates(rxn, {'allowed': allowed}))
 
     def find_metacyc_bounds_rxn(self, model_info):
-        """"""
-        df = pd.read_excel(self.cfg.metacyc_rules)
-        df_name = df.iloc[:, 0]
-        df_lower_bound = df.iloc[:, 1]
-        df_upper_bound = df.iloc[:, 2]
-        df_rxn = df.iloc[:, 3]
-        lower_dict = dict(zip(df_name, df_lower_bound))
-        upper_dict = dict(zip(df_name, df_upper_bound))
-        rxn_dict = dict(zip(df_name, df_rxn))
-        for rxn in model_info["reactions"]:
-            rxn_annotation = rxn["annotation"]
-            if (
-                "biocyc" in rxn_annotation.keys()
-                and type(rxn_annotation["biocyc"]) == str
-            ):
-                cycId = rxn_annotation["biocyc"][5:]
-                for dfId in list(
-                    df_name
-                ):  # Match MetaCyc identifiers with and without compartment suffixes.
-                    if cycId in dfId:
-                        l_met = rxn_dict[dfId].split("-->")[0]
-                        r_met = rxn_dict[dfId].split("-->")[1]
-                        l_list = [m for m in l_met.split("+")]
-                        r_list = [m for m in r_met.split("+")]
-                        if self.get_metacyc_rxn(
-                            rxn,
-                            l_list,
-                            r_list,
-                            lower_dict,
-                            upper_dict,
-                            dfId,
-                            ATP_NAME,
-                            "ATP",
-                        ):
-                            rxn["rules"][
-                                "refer to the Metacyc database to modify the reversibility of this reaction"
-                            ] = "true"
-                        if self.get_metacyc_rxn(
-                            rxn,
-                            l_list,
-                            r_list,
-                            lower_dict,
-                            upper_dict,
-                            dfId,
-                            H2O_NAME,
-                            "WATER",
-                        ):
-                            rxn["rules"][
-                                "refer to the Metacyc database to modify the reversibility of this reaction"
-                            ] = "true"
-                        if self.get_metacyc_rxn(
-                            rxn,
-                            l_list,
-                            r_list,
-                            lower_dict,
-                            upper_dict,
-                            dfId,
-                            NADP,
-                            "NADP",
-                        ):
-                            rxn["rules"][
-                                "refer to the Metacyc database to modify the reversibility of this reaction"
-                            ] = "true"
-                        if (
-                            "ATP" not in rxn["all_mets"]
-                            and "H2O" not in rxn["all_mets"]
-                            and "NADP(+)" not in rxn["all_mets"]
-                        ):
-                            if (
-                                rxn["bounds"][0] != lower_dict[dfId]
-                                or rxn["bounds"][1] != upper_dict[dfId]
-                            ):
-                                rxn["rules"][
-                                    "refer to the Metacyc database to modify the reversibility of this reaction"
-                                ] = "true"
+        """Score disallowed directions, not unequal capacity magnitudes."""
+        from mqc.control.metacyc_direction import apply_rule
+        apply_rule(model_info, self.cfg.metacyc_rules)
 
     def find_energy_reducing_power_rxn(self, model_info, model):
         """Find reactions that do not follow the rules for reactions of energy or reducing power"""
@@ -1147,3 +1156,8 @@ class Rules:
         self.find_metacyc_bounds_rxn(model_info)
         self.find_energy_reducing_power_rxn(model_info, model)
         self.find_modelseed_error_bound_rxn(model_info)
+        self.find_biotin_synthesis_direction(model_info, model)
+        self.find_deacetylase_direction(model_info, model)
+        self.find_desulfurase_direction(model_info, model)
+        self.find_incomplete_quinone_methylation(model_info, model)
+        self.find_sugar_identity_conflicts(model_info, model)

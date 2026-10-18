@@ -35,6 +35,9 @@ from mqc.control.atp_control import Atps
 from mqc.control.net_control import Nets
 from mqc.control.yield_control import Yields
 from mqc.control.biomass_control import Biomasses
+from mqc.control.postgap_control import run_postgap_control, PostGapValidationError
+from mqc.control.electron_stoichiometry import validate_final_templates
+from mqc.control.gap_rule_policy import validate_final_rule_bounds
 
 
 class ModelCheck:
@@ -204,6 +207,7 @@ class ModelCheck:
             controler.model = read_model(final_model)
 
             biomasses = Biomasses(self.cfg)
+            pre_gapfill_ids = {r.id for r in controler.model.reactions}
             biomasses.biomass_control(
                 model_pre_process.model_info,
                 controler.model,
@@ -212,18 +216,29 @@ class ModelCheck:
                 controler,
                 self.model_check_info,
             )
-            final_model = write_final_model(controler.model, self.cfg, self.model_file)
-            controler.model = read_model(final_model)
+            run_postgap_control(model_pre_process.model_info, controler.model,
+                                self.model_control_info, self.cfg, pre_gapfill_ids)
+            validate_final_templates(controler.model, model_pre_process.model_info,
+                                     self.model_control_info)
+            validate_final_rule_bounds(controler.model, model_pre_process.model_info,
+                                       self.model_control_info)
 
             convert_nan_to_null(controler.model)
             convert_nan_to_null(controler.check_model)
 
             convert_list_to_string(self.model_control_info, self.model_check_info)
 
-            final_model = write_final_model(controler.model, self.cfg, self.model_file)
+            final_model = write_final_model(
+                controler.model, self.cfg, self.model_file,
+                biomass_rxn_id=model_pre_process.model_info['initial_rxn']['biomass_rxn_id'] or None)
             check_model = write_check_model(
                 controler.check_model, self.cfg, self.model_file
             )
+        except PostGapValidationError:
+            write_result2(self.model_control_info, self.cfg)
+            write_result3(self.model_control_info, self.cfg)
+            write_model_info(model_pre_process.model_info, self.cfg)
+            raise
         except RuntimeError as e:
             final_model = write_final_model(controler.model, self.cfg, self.model_file)
             check_model = write_check_model(

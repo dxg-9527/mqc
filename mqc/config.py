@@ -28,6 +28,10 @@ class Config:
                 str(output / ("big_model." + extension)),
             )
         self.big_general_library = ""
+        self.biomass_rule_consistency = True
+        # Independent integration trial only; the accepted package is unchanged.
+        self.native_reaction_coverage = True
+        self.repair_single_electron_templates = True
         self.model_info = str(output / "model_info.json")
         data = ROOT / "summary"
         self.general_library_path = str(data / "general_library.xml.gz")

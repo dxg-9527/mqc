@@ -1,0 +1,14 @@
+# Core versions observed in the frozen validation environment (Python 3.8.16).
+# CPLEX still needs a valid installation/license for full model sizes.
+cobra==0.29.1
+optlang==1.8.2
+cplex==22.1.0.0
+python-libsbml==5.20.1
+numpy==1.22.4
+pandas==1.5.3
+sympy==1.12
+swiglpk==5.0.8
+openpyxl==3.1.2
+matplotlib==3.7.5
+memote==0.17.0
+d3flux==0.2.7
