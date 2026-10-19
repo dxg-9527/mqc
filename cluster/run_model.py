@@ -2,6 +2,7 @@
 import argparse
 import csv
 import json
+import math
 import os
 from pathlib import Path
 import sys
@@ -74,7 +75,14 @@ def main():
             final_metabolites=len(model.metabolites), final_solver_status=solution.status,
             final_objective={r.id:float(v) for r,v in linear_reaction_coefficients(model).items()},
             final_objective_value=float(solution.objective_value) if solution.status=='optimal' else None,
-            postgap_status=control['postgap_validation']['status'])
+            postgap_status=control['postgap_validation']['status'],
+            postgap_energy_status=control['postgap_validation'].get('energy_status'),
+            final_growth_status='not_positive')
+        if (not record['final_objective'] or solution.status != 'optimal'
+                or not math.isfinite(record['final_objective_value'])
+                or record['final_objective_value'] <= 1e-7):
+            raise RuntimeError('Final exported model has no positive growth in its stored QC medium')
+        record['final_growth_status']='positive'
         if solution.status=='optimal':
             flux=pfba(model).fluxes
             residuals={m.id:0. for m in model.metabolites}

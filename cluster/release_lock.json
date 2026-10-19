@@ -3,12 +3,12 @@
   "core_hashes": {
     "mqc/__main__.py": "d190bfeba4735410597452a8fa24fc9ac7a2881d95f920dacd44d7689fd8369e",
     "mqc/solver_utils.py": "29c8a356a0f47bb5dd1a85930232163bb50cc4281be0f24d32c631f170650126",
-    "mqc/main.py": "f54ed736437e159a9b31b174ee415aca9bc54fc4dae1d7c179abc4dc669be75e",
+    "mqc/main.py": "e30aa0789598f7ed3b227570553985094f54f44a58af8617cd228a0529a77ae3",
     "mqc/config.py": "5350f415357b771f8ebe6d758bc711be67a05c14aa887683e7556b2c40dcfd0d",
     "mqc/mqcpath_visualization.py": "7d6ec9987c58e67b891136806046e0626c03e0e4d577767f0b5b970f66504a7d",
     "mqc/__init__.py": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
     "mqc/defaults.py": "475ca4a71a56249af5413ec2742e9ade39f68c1dc26304d4bad4cb30960a4529",
-    "mqc/utils.py": "5b208eb2e5089b1da1d5bee320c2fa7b21731d7947c4376970bf25d80cb6c206",
+    "mqc/utils.py": "670f5cbe286961de515896c4434d5998df2a218bd4d9a45de517697892d2a40b",
     "mqc/control/library_charge.py": "7d2511c530aa54cc74eaa9af0e929a98f362608314d0853843d524ab5e9d94ba",
     "mqc/control/growth_environment.py": "a9d49936e41f9a5d7c1d3b30b4eade4bd61fa4a6ff2611d652098d33132781a2",
     "mqc/control/atp_control.py": "476ecb50f5540d949d0f93680b46c2ee4a1573a1ca1225b0838e7a9471b7d501",
@@ -20,7 +20,7 @@
     "mqc/control/initial_control.py": "2c330d063493b0c9b689208ec18c5ca1715dd9deb9c5244a7f5e517b9eb2a148",
     "mqc/control/electron_stoichiometry.py": "b727604809021d6f60cbfaacc72628c364ca074502ca1643c958df5878accf7a",
     "mqc/control/flavodoxin_identity.py": "8ef549050ff5ace0166de5f9f6995494ffb21052bb4d467ad955f7d869e0d7b3",
-    "mqc/control/biomass_control.py": "5a653fac3cc00e3523ced80214730e00be9c375fb9ea3745dcc56aedb57529ed",
+    "mqc/control/biomass_control.py": "faa512edd9d893053b8b13fbea5425080bbdebfabd8275172f9361cfe68fbc98",
     "mqc/control/yield_control.py": "06d0c14c63ca1403d3cc8f93946d5c8e42371f6a37b906a7eb1f50cfe25a1e67",
     "mqc/control/biotin_direction.py": "2d37eb2e3d5fc2078cf9c1751bedd3446fe3b32359e1cf4c1ccd1a4480b8729a",
     "mqc/control/rules_control.py": "454e7731781938a5e66a05204091ea79ba53dd1e636a0c94fe6afe077eb3e497",
@@ -33,8 +33,8 @@
     "mqc/control/rules_control2.py": "cb9593225d90e2c291f8c71e0feeaaf912e77154e63a630d7d830a095e2962a3",
     "mqc/control/model_control.py": "3b15e1237e9d026921fd556c2bc68648f36aa6bc9904b626f66778e1c6f4dce9",
     "mqc/control/metabolite_chemistry.py": "319c12601f0de665e9270e1517c51686d0b6fffad89198365688e9e472c31b47",
-    "mqc/control/net_control.py": "8f45fa36f81a045e6b67af6307f4442f9b096f77b08f25c026b54fb7c9ced0bd",
-    "mqc/control/postgap_control.py": "f57c61bd735ec1c9ced8c38432a814647fd5b8bad3b785a7fa2b412bd2518350",
+    "mqc/control/net_control.py": "01b753bc3b5b4c22bbd117feff3bb8ff00ffc180ea694bfee05c5c34ca13cba4",
+    "mqc/control/postgap_control.py": "0abe681ea639162cbcba660531107f737f435e6ca1eb97bc35fd644c6fc435cd",
     "mqc/control/nitric_oxide_direction.py": "76652052048260c6ec6ea518ed9cd66bbb2e0a45d237b7aa694ca7b4aa0cad5d",
     "mqc/control/nadh_control.py": "b4773886ad1d239039d0ef87692046a860eb5cec20172e3f85b29705c357c31e",
     "mqc/control/quinone_methylation.py": "08dfcbfc46dce7e78a5429f99914e5412d2bf0d18a09684bef28173646421766",
@@ -49,7 +49,8 @@
     "mqc/summary/modelseed_reactions.xlsx": "95f4f0d04ed4fcaa59e386f974f64baed6581e42b821a363077d2b2e1e0ae257",
     "mqc/summary/meta_met.xlsx": "49f41bd03ea0b4cb4453977e15f98a579fcde01f4b7e45068e6d3273c4b6e192",
     "mqc/summary/modelseed_met.xlsx": "ef9682c564b2cf53f5143c47cce32ef357074286472602512bcd0be74af7216a",
-    "mqc/summary/kegg_met.xlsx": "957736190befcdee24bdd08f10e83974c374a35226ea5dfa333d9ff22d1dce75"
+    "mqc/summary/kegg_met.xlsx": "957736190befcdee24bdd08f10e83974c374a35226ea5dfa333d9ff22d1dce75",
+    "mqc/control/boundary_diagnostics.py": "053c6b4f4b19e04f022bb6181d3bbbdb4d3c3932d049bb07d98f98218984c84f"
   },
   "frozen_optimized_source_lock_sha256": "4b47e3654eac47ea327baf2af168ee1cbff405257900c8a116c1b66e2221ae02",
   "historical_baseline_rerun": false,
@@ -65,9 +66,9 @@
   ],
   "model_count": 6543,
   "original_public_commit": "fc15b9cf2ee27bb731c9f5fdf07e27e58d953a72",
-  "parent_git_commit": "d75d54c23341dab49d0052e6fcd0587e8a525e51",
-  "parent_release_lock_sha256": "d70f17dd4bb28491f86b2c8855853ef13a55d6facdd1a787950e9a278504f876",
-  "release": "optimized-cluster-fixes-20261019",
+  "parent_git_commit": "ef85b7b71a1c93c5841eff68d4dd87c732332c57",
+  "parent_release_lock_sha256": "8b18cc856246086f803027fafe483387ac40eddf79d6b116d2695ea4d5926e3b",
+  "release": "optimized-cluster-review-fixes-20261019",
   "runner_hashes": {
     "cluster/array.sbatch": "af6cdb31b75989c3628718db89873a43ce2116ed6a30a9057ca32c172aeaa9ac",
     "cluster/check_environment.py": "e495f0882aa22c4d54617d4718e2a03000a94aa99d0566db779381f9be17d9ca",
@@ -75,15 +76,24 @@
     "cluster/common.py": "5ba0d8d5c3fd507874802a9f8d872988689f32feb8da6a2146b1c1b1d18b2fc0",
     "cluster/prepare_inputs.py": "23a50bd3e8dcf1629ff860b2bc38cea9bd1139791e6a033e8587256e8f904a5a",
     "cluster/requirements-validated.txt": "6fd9e5a1dc9dbc2ff7d682d38f751e9c9af7c1346b2b95ff00c1aa5edafc82c7",
-    "cluster/run_model.py": "6409bfd26d003baab624e793ee9531b4b57481228942c1d55e786b47f38c8e34",
+    "cluster/run_model.py": "537fbbb7d2c0dc013c09997142107ac7209d2a6943985e6da90be6a403890a4e",
     "cluster/submit.py": "181dbe0693405f45b1c7b2eac12941d9213985299a2ceee516c7ba6e07af2f91",
     "cluster/test_tools.py": "122981fc6e98f7763f159d2ec87a7dba0990f6ed2db5cb1cdf7d2ed6699ebba5",
     "cluster/verify_inputs.py": "3b7e82386c5d4cf750954b3839fef6c9213e4cda3010da84e00dfa70f6739671",
     "cluster/worker.py": "d58ba7c173ae873c821b5855c4c695bbd8154024bb1a8379fa04a5a4bc98f48a",
     "tests/test_cluster_compatibility.py": "6054a0052d883ff27c6cc8e86340a376ddd52e2fea8267f46cc3c56440365694",
-    "tests/test_cluster_recovery.py": "304aa29035a5ad6e0ed6b53a717950cb54fb0248b4ee0b9080af22995c836875"
+    "tests/test_cluster_recovery.py": "304aa29035a5ad6e0ed6b53a717950cb54fb0248b4ee0b9080af22995c836875",
+    "tests/test_cluster_review.py": "ca3e31a668cd9f1db3fbbf2629571f89fa5153fdf22dc3e9700935c7eecc72d0"
   },
   "schema": 1,
   "validation_environment_python": "3.8.16",
-  "supplied_patch_sha256": "fb7275e42cb4315f1662deb8e846d264e4f476ed09f07e077b33e5fc8287028d"
+  "supplied_patch_sha256": "fb7275e42cb4315f1662deb8e846d264e4f476ed09f07e077b33e5fc8287028d",
+  "review_fixes": [
+    "direction-aware biomass coupling",
+    "positive final growth acceptance",
+    "bounded transactional multi-cut cycle fallback",
+    "signed boundary and nitrogen yield ledger",
+    "temporary unresolved input closure for net assay",
+    "early missing-biomass applicability failure"
+  ]
 }

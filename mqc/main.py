@@ -130,6 +130,16 @@ class ModelCheck:
         model_pre_process.model_info["model_file"] = self.model_file
 
         try:
+            biomass_id = model_pre_process.model_info.get("initial_rxn", {}).get("biomass_rxn_id")
+            if not biomass_id or biomass_id not in controler.model.reactions:
+                # Detection can describe a non-growing tissue model; correction
+                # cannot promise growth preservation without a biomass target.
+                self.model_control_info['final_model_status'] = 'unsupported_biomass_objective'
+                self.model_control_info['input_applicability'] = {
+                    'status': 'unsupported', 'reason': 'missing_biomass_objective',
+                    'objective_invented': False,
+                }
+                raise PostGapValidationError('missing_biomass_objective: correction requires an identified biomass reaction')
             initial_pre_process = InitialPreprocess(self.cfg)
             initial_pre_process.initial_control(
                 model_pre_process.model_info,

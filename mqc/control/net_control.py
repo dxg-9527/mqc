@@ -320,6 +320,15 @@ class Nets:
     def net_control(
         self, model_info, model, check_model, model_control_info, model_check_info, obj
     ):
+        from mqc.control.boundary_diagnostics import without_unresolved_inputs
+        with without_unresolved_inputs(model) as changes:
+            model_info["net_assay_unresolved_input_closures"] = changes
+            model_control_info["check_metabolite_production"]["unresolved_input_closures"] = changes
+            return self._net_control(model_info, model, check_model, model_control_info, model_check_info, obj)
+
+    def _net_control(
+        self, model_info, model, check_model, model_control_info, model_check_info, obj
+    ):
         """
         nets correction process
         """

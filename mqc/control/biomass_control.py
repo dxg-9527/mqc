@@ -13,6 +13,7 @@ from mqc.control.model_control import ModelPreprocess
 from mqc.control.gapfill_chemistry import assess_gapfill_chemistry, record_gapfill_assessment
 from mqc.control.gap_compartments import target_inventory, foreign_compartments
 from mqc.control.proton_duplicate import native_proton_index, proton_duplicate_conflict
+from mqc.control.boundary_diagnostics import unresolved_boundary_source
 from mqc.control.gap_rule_policy import (
     enabled as rule_policy_enabled, apply_native_rules, configure_candidates,
     candidate_copy, rule_pfba,
@@ -1372,17 +1373,10 @@ class Biomasses:
                 rxns = model.reactions.get_by_id(r)
                 all_mets = [m.id for m in rxns.metabolites]
                 met_formula = list(rxns.metabolites.keys())[0].formula
-                if r == initial_rxn_id or (
-                    len(all_mets) == 1
-                    and (
-                        pd.isna(met_formula)
-                        or "R" in met_formula
-                        or "X" in met_formula
-                        or met_formula == "nan"
-                        or not met_formula
-                        or met_formula == "null"
-                    )
-                ):
+                # Unknown material entering the model can supply a precursor;
+                # an outward biomass drain cannot. Keep the native biomass
+                # coupling check, but never mistake secretion for supply.
+                if r == initial_rxn_id or unresolved_boundary_source(rxns, need_fluxes[r]):
                     if (
                         r != small_demand_id and r not in sink_rxn
                     ):  # Check for coupling through biomass or macromolecular exchange reactions.
@@ -1538,17 +1532,7 @@ class Biomasses:
                 rxns = model.reactions.get_by_id(r)
                 all_mets = [m.id for m in rxns.metabolites]
                 met_formula = list(rxns.metabolites.keys())[0].formula
-                if r == initial_rxn_id or (
-                    len(all_mets) == 1
-                    and (
-                        pd.isna(met_formula)
-                        or "R" in met_formula
-                        or "X" in met_formula
-                        or met_formula == "nan"
-                        or not met_formula
-                        or met_formula == "null"
-                    )
-                ):
+                if r == initial_rxn_id or unresolved_boundary_source(rxns, need_fluxes[r]):
                     if (
                         r != macro_demand_id and r not in sink_rxn
                     ):  # Check for coupling through biomass or macromolecular exchange reactions.

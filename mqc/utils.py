@@ -598,13 +598,14 @@ def max_reduced_degree_rate(model, metId, model_info):
 
             if len(all_mets) == 1 and metId not in all_mets:
                 if mets.id not in O2 and mets.name not in O2_NAME:
-                    for k in ["S", "C", "H", "O", "P"]:
-                        if k in mets.elements.keys():
-                            met_degree += -float(v) * reduced_degree(
-                                model, all_mets[0]
-                            )
-
-                            break
+                    # Include N-only products (e.g. N2), charged ions and the
+                    # actual boundary stoichiometry. Assuming -1 silently
+                    # corrupts the electron balance for reversed/scaled sinks.
+                    met_degree += (rxn.get_coefficient(mets.id) * float(v)
+                                   * reduced_degree(model, mets.id))
+                # Preserve MQC's oxygen-excluded yield ceiling. In particular,
+                # do not use unexplained oxygen production to justify a yield
+                # excess: these pathways remain subject to correction/review.
         max_rate = (met_degree) / abs(degree)
 
     elif round(degree, 5) < 0:

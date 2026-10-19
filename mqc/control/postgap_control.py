@@ -1,9 +1,9 @@
 """Conservative, experiment-independent validation after biomass gap filling.
 
 Checks source-free dissipation of recognized cytosolic energy/redox carriers.
-Newly gap-filled directions are tried first. If none preserve growth, one
-existing witnessed direction may be restricted only if ALL available carrier
-tests then pass. This is an explicit network repair, not an enzyme assignment.
+Newly gap-filled directions are tried first. If none preserve growth, a bounded
+sequence of existing witnessed directions may be tried. The sequence is kept
+only if ALL available carrier tests pass. This is a network repair, not an enzyme assignment.
 Repairs must
 preserve growth viability in the unchanged, stored QC medium; an optimum
 inflated by a witnessed source-free cycle is not a conservation target. This is
@@ -166,17 +166,20 @@ def _growth_viable(before, after, tolerance):
     value = after.get("value")
     return (after.get("solver_status") == "optimal" and value is not None
             and math.isfinite(value)
-            and (value > tolerance if before["value"] > tolerance else value >= -tolerance))
+            and value > tolerance)
 
 
 def validate_and_repair(model, biomass_id, gapfill_ids, pre_gapfill_ids,
-                        tolerance=1e-7, max_edits=24, reaction_evidence=None):
+                        tolerance=1e-7, max_edits=24, reaction_evidence=None,
+                        max_existing_edits=4):
     """Transactional guard: failed validation never leaves partial repairs.
 
     Greedily block a witnessed direction of a *newly added* gap reaction.
     A bounded original-network fallback is allowed only when new directions
     cannot preserve growth, the witness contains a new gap reaction, and a
-    single old-direction cut resolves every available energy/redox target.
+    bounded sequence resolves every available energy/redox target. Single-cut
+    solutions are preferred. Partial old-network steps must reduce the current
+    cycle and must not reactivate an already-passed carrier diagnostic.
     Prefer the largest reduction in the current cycle diagnostic; ties use ID.
     Parallel cycles can retain the capped objective, so strict improvement is
     not required. Every accepted step removes a witnessed feasible direction.
@@ -184,17 +187,20 @@ def validate_and_repair(model, biomass_id, gapfill_ids, pre_gapfill_ids,
     targets, coverage = discover_targets(model)
     eligible = sorted((set(gapfill_ids) - set(pre_gapfill_ids)) & set(model.reactions.list_attr("id")))
     evidence = {r['id']: r for r in (reaction_evidence or [])}
-    report = {"schema_version": 2, "status": "failed", "tolerance": tolerance,
+    report = {"schema_version": 3, "status": "failed", "tolerance": tolerance,
               "diagnostic_drain_cap": 1000, "coverage": coverage,
               "scope": "recognized cytosolic carriers; no full thermodynamic guarantee",
               "eligible_new_gap_reactions": eligible, "attempts": [], "repairs": [],
               "before": [], "after": [], "experimental_data_used": False,
-              "growth_acceptance_policy": "positive_growth_not_cycle_inflated_optimum"}
+              "growth_acceptance_policy": "positive_growth_not_cycle_inflated_optimum",
+              "max_existing_direction_edits": max_existing_edits,
+              "growth_status": "not_tested", "energy_status": "not_tested"}
     if not biomass_id or biomass_id not in model.reactions:
         report["reason"] = "missing_biomass_objective"
         return report
     growth_before = _growth(model, biomass_id)
     report["growth_before"] = growth_before
+    report["growth_status"] = "positive" if _growth_viable(growth_before, growth_before, tolerance) else "nonpositive_or_unsolved"
     if growth_before["solver_status"] != "optimal" or growth_before["value"] is None:
         report["reason"] = "stored_medium_growth_not_solved"
         return report
@@ -216,6 +222,10 @@ def validate_and_repair(model, biomass_id, gapfill_ids, pre_gapfill_ids,
             report["after"] = checks
             unresolved = [d for d in checks if not d["passed"]]
             if not unresolved:
+                report["energy_status"] = "passed"
+                if not _growth_viable(growth_before, _growth(model, biomass_id), tolerance):
+                    report["reason"] = "zero_growth_after_correction"
+                    break
                 report["status"] = "repaired" if proposed else "passed"
                 report["reason"] = "all_available_targets_passed"
                 break
@@ -266,7 +276,10 @@ def validate_and_repair(model, biomass_id, gapfill_ids, pre_gapfill_ids,
                 # All existing alternatives are reported; no phenotype or
                 # reaction-ID whitelist is consulted.
                 witnessed = diagnostic.get('witness', [])
-                fallback = []
+                fallback, partial = [], []
+                if sum(r.get('scope') == 'existing_cycle_direction' for r in proposed) >= max_existing_edits:
+                    report['reason'] = 'existing_direction_budget_exhausted'
+                    break
                 if any(row['reaction_id'] in eligible for row in witnessed):
                     for row in sorted(witnessed, key=lambda x: x['reaction_id']):
                         rid = row['reaction_id']
@@ -293,18 +306,32 @@ def validate_and_repair(model, biomass_id, gapfill_ids, pre_gapfill_ids,
                                 trial['all_target_checks'] = [diagnose(model, t, tolerance) for t in targets]
                                 if all(d['passed'] for d in trial['all_target_checks']):
                                     fallback.append(trial)
+                                else:
+                                    old_checks = {d['target']: d for d in checks}
+                                    current = next(d for d in trial['all_target_checks'] if d['target'] == target['target'])
+                                    valid = all(d['solver_status'] == 'optimal' and d['value'] is not None
+                                                for d in trial['all_target_checks'])
+                                    no_reactivated = all(not old_checks[d['target']]['passed'] or d['passed']
+                                                         for d in trial['all_target_checks'])
+                                    if (valid and no_reactivated and current['value'] < diagnostic['value'] - tolerance):
+                                        trial['current_cycle_after'] = current['value']
+                                        partial.append(trial)
                         attempt['candidates'].append(trial)
-                if not fallback:
+                if not fallback and not partial:
                     report['reason'] = 'no_growth_preserving_safe_cycle_direction'
                     break
                 # Higher original penalties first, then preserve gene-supported
                 # reactions and avoid full deletions; use stored-medium growth
                 # only as a final tie-breaker, never experimental growth values.
-                chosen = min(fallback, key=lambda x: (-float(x['net_penalty_points']),
+                ranking = lambda x: (-float(x['net_penalty_points']),
                     x['has_gpr'], x['removes_entire_reaction'],
-                    -x['growth']['value'], x['reaction_id']))
-                attempt['fallback_policy'] = 'single_existing_cut_all_targets_pass'
+                    -x['growth']['value'], x['reaction_id'])
+                chosen = (min(fallback, key=ranking) if fallback else
+                          min(partial, key=lambda x: (round(x['current_cycle_after'], 7), ranking(x))))
+                attempt['fallback_policy'] = ('single_existing_cut_all_targets_pass' if fallback else
+                                              'bounded_existing_sequence_pending_final_validation')
                 attempt['safe_alternatives'] = [r['reaction_id'] for r in fallback]
+                attempt['partial_progress_alternatives'] = [r['reaction_id'] for r in partial]
                 attempt['chosen_reaction'] = chosen['reaction_id']
                 model.reactions.get_by_id(chosen['reaction_id']).bounds = tuple(chosen['new_bounds'])
                 proposed.append(chosen)
@@ -316,6 +343,8 @@ def validate_and_repair(model, biomass_id, gapfill_ids, pre_gapfill_ids,
             attempt["chosen_reaction"] = chosen["reaction_id"]
             checks = [diagnose(model, t, tolerance) for t in targets]
         report["growth_after_trial"] = _growth(model, biomass_id)
+        report['growth_status'] = 'positive' if _growth_viable(growth_before, report['growth_after_trial'], tolerance) else 'nonpositive_or_unsolved'
+        report['energy_status'] = 'passed' if all(d['passed'] for d in report['after']) else 'failed_or_incomplete'
     report["proposed_repairs"] = proposed
     if report["status"] != "failed":
         for change in proposed:

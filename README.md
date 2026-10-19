@@ -4,16 +4,21 @@
 
 Branch `optimized-20261018` contains the frozen optimized correction implementation
 and a portable Slurm batch runner. It does not replace the AWS deployment or the
-original `main` branch. The `mqc/` source and reference data are byte-identical to
-the optimized version used in the final three-strain local verification; their
-hashes are recorded in `cluster/release_lock.json`.
+original `main` branch. It includes the optimized implementation and subsequent
+cluster failure fixes; it is no longer byte-identical to the initial three-strain
+release. Exact source and reference hashes are in `cluster/release_lock.json`.
+
+For the latest fixes and the 213-model follow-up list, see
+[the cluster review release notes](CLUSTER_REVIEW_FIXES_20261019.md).
 
 See [the Chinese cluster guide](cluster/README_zh.md) for model transfer,
 environment checks, array submission, failed-job retry, and return files.
 The runner invokes correction only, without a detection pre-run, and preserves
 stage models, flux tables, final exports, failures and version provenance.
-The planned 6,543-model cluster validation has not yet been completed.
-Local runner tests and a complete e_coli_core correction/export smoke run are
+The first cluster run and a 622-model retry used earlier source locks. A full
+6,543-model validation of this new release is still pending; do not merge results
+from different locks as a same-version cohort.
+The original runner tests and e_coli_core correction/export smoke run are
 recorded in [the release validation](validation/optimized_cluster_smoke_20261018.json).
 
 MQC detects quantitative defects in genome-scale metabolic models and supports

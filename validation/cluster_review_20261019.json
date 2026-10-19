@@ -1,0 +1,247 @@
+{
+  "parent_commit": "ef85b7b71a1c93c5841eff68d4dd87c732332c57",
+  "release": "optimized-cluster-review-fixes-20261019",
+  "release_lock_sha256": "904feb41f6dc5da5fda420f8d9a69ca918195e0d56cd747bf9ee86355964674e",
+  "complete_workflows": [
+    {
+      "job_id": "bigg_005586",
+      "status": "failed",
+      "seconds": 8.618555068969727,
+      "finished_stages": 0,
+      "final_growth": null,
+      "postgap_status": null,
+      "energy_status": null,
+      "max_abs_Sv": null,
+      "bound_violation": null,
+      "input_sha256": "3d921dc32f7f4ef14f7f7da4b9ba014aa30a2d14288803d3c88d1b89d46f041e",
+      "final_model_sha256": null,
+      "release_sha256": "904feb41f6dc5da5fda420f8d9a69ca918195e0d56cd747bf9ee86355964674e",
+      "failure_category": "missing_biomass_objective",
+      "error": "PostGapValidationError('missing_biomass_objective: correction requires an identified biomass reaction')",
+      "evidence": "full/bigg_005586/outcome.json"
+    },
+    {
+      "job_id": "bigg_005594",
+      "status": "failed",
+      "seconds": 21.444902896881104,
+      "finished_stages": 0,
+      "final_growth": null,
+      "postgap_status": null,
+      "energy_status": null,
+      "max_abs_Sv": null,
+      "bound_violation": null,
+      "input_sha256": "86a75add525bc86ae4ec929325735cc1568ef6f2f55555eb6f3bec101c6ccf7a",
+      "final_model_sha256": null,
+      "release_sha256": "904feb41f6dc5da5fda420f8d9a69ca918195e0d56cd747bf9ee86355964674e",
+      "failure_category": "missing_biomass_objective",
+      "error": "PostGapValidationError('missing_biomass_objective: correction requires an identified biomass reaction')",
+      "evidence": "full/bigg_005594/outcome.json"
+    },
+    {
+      "job_id": "carveme_000813",
+      "status": "completed",
+      "seconds": 219.65705180168152,
+      "finished_stages": 6,
+      "final_growth": 0.5496439452523806,
+      "postgap_status": "repaired",
+      "energy_status": "passed",
+      "max_abs_Sv": 5.663742044803577e-14,
+      "bound_violation": 1.48991929904696e-13,
+      "input_sha256": "b321ca8a3094149a843d4016371654176c860ff5c74f469ad5b9469b84324efc",
+      "final_model_sha256": "5e37a256b652a6f120cc6d83992dbf23ab610b45c97de3eae477545647cad360",
+      "release_sha256": "904feb41f6dc5da5fda420f8d9a69ca918195e0d56cd747bf9ee86355964674e",
+      "failure_category": null,
+      "error": null,
+      "evidence": "full/carveme_000813/outcome.json"
+    },
+    {
+      "job_id": "carveme_001059",
+      "status": "completed",
+      "seconds": 430.7090048789978,
+      "finished_stages": 6,
+      "final_growth": 0.9041707377750401,
+      "postgap_status": "passed",
+      "energy_status": "passed",
+      "max_abs_Sv": 9.083012120214562e-14,
+      "bound_violation": 0.0,
+      "input_sha256": "6e84b2baa968aa34e95152aaa73005dd988f68c76692f72bc225adce23fe55d1",
+      "final_model_sha256": "4fc162cb8dc16cfaf56d83b87837e3f57f2f18e45a3f4a02f48c9bdfcdb39a97",
+      "release_sha256": "904feb41f6dc5da5fda420f8d9a69ca918195e0d56cd747bf9ee86355964674e",
+      "failure_category": null,
+      "error": null,
+      "evidence": "full/carveme_001059/outcome.json"
+    },
+    {
+      "job_id": "vmh_005822",
+      "status": "completed",
+      "seconds": 527.5720870494843,
+      "finished_stages": 6,
+      "final_growth": 0.48492061274728754,
+      "postgap_status": "passed",
+      "energy_status": "passed",
+      "max_abs_Sv": 1.3128387266192476e-14,
+      "bound_violation": 1.566746732351021e-12,
+      "input_sha256": "80c939c96016d3759f326f597e4187d63b25598654b90189710f1700009d49d7",
+      "final_model_sha256": "9329d12ea52905ffc3ac19bef4337fff332cb135ef2503be4cc589de644ba7a7",
+      "release_sha256": "904feb41f6dc5da5fda420f8d9a69ca918195e0d56cd747bf9ee86355964674e",
+      "failure_category": null,
+      "error": null,
+      "evidence": "full/vmh_005822/outcome.json"
+    },
+    {
+      "job_id": "vmh_005878",
+      "status": "completed",
+      "seconds": 383.0045425891876,
+      "finished_stages": 6,
+      "final_growth": 30.18249430279233,
+      "postgap_status": "passed",
+      "energy_status": "passed",
+      "max_abs_Sv": 6.590283874174929e-13,
+      "bound_violation": 9.094947017729282e-12,
+      "input_sha256": "f3a4e7d9f8e6576c3010b5934ae9cae65eca2c0e54f8c304a86ef71df93492f8",
+      "final_model_sha256": "d2980f8bd8ef49f3514c3abd93e1649f3f2eee88a5a569be54edb4bd763eeb42",
+      "release_sha256": "904feb41f6dc5da5fda420f8d9a69ca918195e0d56cd747bf9ee86355964674e",
+      "failure_category": null,
+      "error": null,
+      "evidence": "full/vmh_005878/outcome.json"
+    },
+    {
+      "job_id": "vmh_006357",
+      "status": "completed",
+      "seconds": 350.1447083950043,
+      "finished_stages": 6,
+      "final_growth": 37.085759071825166,
+      "postgap_status": "passed",
+      "energy_status": "passed",
+      "max_abs_Sv": 4.1602277178753866e-12,
+      "bound_violation": 1.9667822925839573e-11,
+      "input_sha256": "a869f22454a1a88f1450dcbf85f46e171ac8df2cc5a5a0ce4dd57a587fc26686",
+      "final_model_sha256": "feb91e2ff0c0e772bfdab34ffef3bc83e39a4ca60ee96b981a482a2538925988",
+      "release_sha256": "904feb41f6dc5da5fda420f8d9a69ca918195e0d56cd747bf9ee86355964674e",
+      "failure_category": null,
+      "error": null,
+      "evidence": "full/vmh_006357/outcome.json"
+    }
+  ],
+  "checkpoint_guard_trials": [
+    {
+      "job_id": "carveme_000029",
+      "status": "repaired",
+      "final_growth": 0.3735392369835367,
+      "energy_targets": 10,
+      "energy_status": "passed",
+      "repairs": [
+        "Mn2t",
+        "PACt2r",
+        "GLUt2r"
+      ],
+      "evidence": "targeted/carveme_000029_guard.json"
+    },
+    {
+      "job_id": "carveme_000265",
+      "status": "repaired",
+      "final_growth": 0.49757063577949484,
+      "energy_targets": 11,
+      "energy_status": "passed",
+      "repairs": [
+        "PROt2r",
+        "PIt2r"
+      ],
+      "evidence": "targeted/carveme_000265_guard.json"
+    },
+    {
+      "job_id": "carveme_001332",
+      "status": "repaired",
+      "final_growth": 0.515987794832477,
+      "energy_targets": 11,
+      "energy_status": "passed",
+      "repairs": [
+        "GLUt2r",
+        "MALt4"
+      ],
+      "evidence": "targeted/carveme_001332_guard.json"
+    }
+  ],
+  "software_tests": [
+    {
+      "log": "tests/0.log",
+      "count": 27,
+      "passed": true
+    },
+    {
+      "log": "tests/1.log",
+      "count": 8,
+      "passed": true
+    }
+  ],
+  "retained_yield_routes": {
+    "total": 23,
+    "still_excess": 9,
+    "scope": "Frozen five-decimal pFBA pathways; accounting tolerance 1e-5; not 23 full correction runs"
+  },
+  "scope": "Local selected regression only; not 213-model or 6543-model batch acceptance. No experimental accuracy claim.",
+  "environment_image": "sha256:ad8db5506ca09a5c4e0a62c711ece6ab633c02403a534502c1e7458e540889ae",
+  "independent_actual_XML_checks": [
+    {
+      "job_id": "carveme_000813",
+      "growth": 0.5496439452523806,
+      "energy_target_count": 11,
+      "all_energy_passed": true,
+      "maximum_abs_energy_flux": 0.0,
+      "maximum_abs_Sv": 5.663742044803577e-14,
+      "maximum_bound_violation": 1.48991929904696e-13,
+      "biomass_outlet_bounds": null
+    },
+    {
+      "job_id": "carveme_001059",
+      "growth": 0.9041707377750401,
+      "energy_target_count": 11,
+      "all_energy_passed": true,
+      "maximum_abs_energy_flux": 0.0,
+      "maximum_abs_Sv": 9.083012120214562e-14,
+      "maximum_bound_violation": 0.0,
+      "biomass_outlet_bounds": null
+    },
+    {
+      "job_id": "vmh_005822",
+      "growth": 0.48492061274728754,
+      "energy_target_count": 10,
+      "all_energy_passed": true,
+      "maximum_abs_energy_flux": 0.0,
+      "maximum_abs_Sv": 1.3128387266192476e-14,
+      "maximum_bound_violation": 1.566746732351021e-12,
+      "biomass_outlet_bounds": [
+        0.0,
+        1000.0
+      ]
+    },
+    {
+      "job_id": "vmh_005878",
+      "growth": 30.18249430279233,
+      "energy_target_count": 11,
+      "all_energy_passed": true,
+      "maximum_abs_energy_flux": 0.0,
+      "maximum_abs_Sv": 6.590283874174929e-13,
+      "maximum_bound_violation": 9.094947017729282e-12,
+      "biomass_outlet_bounds": [
+        0.0,
+        1000.0
+      ]
+    },
+    {
+      "job_id": "vmh_006357",
+      "growth": 37.085759071825166,
+      "energy_target_count": 11,
+      "all_energy_passed": true,
+      "maximum_abs_energy_flux": 0.0,
+      "maximum_abs_Sv": 4.1602277178753866e-12,
+      "maximum_bound_violation": 1.9667822925839573e-11,
+      "biomass_outlet_bounds": [
+        0.0,
+        1000.0
+      ]
+    }
+  ],
+  "local_evidence_directory": "mqc-cluster-remediation-20261019",
+  "new_full_batch_pending": true
+}
