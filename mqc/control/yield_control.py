@@ -64,7 +64,7 @@ class Yields:
                     objectiveId = add_demand(model_info, model, met.id)
                     model.objective = objectiveId
 
-                    max_rate = max_reduced_degree_rate(model, met.id, model_info)
+                    max_rate, _ = max_reduced_degree_rate(model, met.id, model_info)
 
                     if (
                         max_rate == 0 or "R" in met.formula or "X" in met.formula
@@ -89,7 +89,7 @@ class Yields:
                         "  max_rate: ",
                         max_rate,
                     )
-                    if round(model_opt, 2) > round(max_rate, 2):
+                    if exceeds_yield_limit(model_opt, max_rate):
                         yield_generation.append(met.id)
                         initial_yield_flux.extend([f"{met.id} : {round(model_opt,2)}"])
         print(
@@ -150,7 +150,7 @@ class Yields:
 
                         model_opt = model.slim_optimize()
 
-                        if round(model_opt, 2) > round(max_rate, 2):
+                        if exceeds_yield_limit(model_opt, max_rate):
                             print(met.id, round(model_opt, 2), round(max_rate, 2))
                             yield_generation.append(met.id)
                             initial_yield_flux.extend(
@@ -274,10 +274,7 @@ class Yields:
             temp_rxnId,
             need_gap_rxn,
         ) = ([], 0, 0, "", 0, [], {}, "", [])
-        if round(model.slim_optimize(), 2) <= round(max_rate, 2):
-
-            pass
-        while round(model.slim_optimize(), 2) > round(max_rate, 2):
+        while exceeds_yield_limit(model.slim_optimize(), max_rate):
             count += 1
 
             if objects == object_rxn_id and fluxs == round(model.slim_optimize(), 3):
@@ -497,8 +494,8 @@ class Yields:
                 else:
                     object_rxn_id = add_demand(modelInfo, model, yieldId)
                 model.objective = object_rxn_id
-                temp_max_rate = max_reduced_degree_rate(model, yieldId, modelInfo)
-                if round(model.slim_optimize(), 2) <= round(temp_max_rate, 2):
+                temp_max_rate, _ = max_reduced_degree_rate(model, yieldId, modelInfo)
+                if not exceeds_yield_limit(model.slim_optimize(), temp_max_rate):
                     temp_yield.append(yieldId)
 
         temp["dependence_on_carbonaceous_substances"][f"{','.join(infinite_rxn)}"] = (
@@ -528,7 +525,7 @@ class Yields:
                     temp_max_rate, temps = max_reduced_degree_rate(
                         model, yieldId, modelInfo
                     )
-                    if round(model.slim_optimize(), 2) <= round(temp_max_rate, 2):
+                    if not exceeds_yield_limit(model.slim_optimize(), temp_max_rate):
                         temp_yield.append(yieldId)
 
             if temp_yield:
@@ -577,6 +574,8 @@ class Yields:
             temp["dependence_on_carbonaceous_substances"] = {}
 
             temp["model_revision"], temp["related_reaction"] = [], []
+            # The report also covers cases where no candidate reaction is revised.
+            model_revision_id = []
             for yieldId in model_info["yield_generation"]:
                 print("yieldId:", yieldId)
                 with model:

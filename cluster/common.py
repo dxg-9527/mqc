@@ -88,8 +88,12 @@ def load_inputs(root):
 
 
 def git_commit():
-    p = subprocess.run(['git', '-C', str(REPO), 'rev-parse', 'HEAD'],
-                       capture_output=True, text=True)
+    # Git metadata is supplementary; the content hash lock remains mandatory.
+    try:
+        p = subprocess.run(['git', '-C', str(REPO), 'rev-parse', 'HEAD'],
+                           capture_output=True, text=True, timeout=10)
+    except (OSError, subprocess.TimeoutExpired):
+        return 'unavailable'
     return p.stdout.strip() if p.returncode == 0 else 'unavailable'
 
 

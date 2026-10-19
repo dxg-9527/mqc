@@ -128,6 +128,15 @@ class Rules:
                     (direction == -1 and r.upper_bound > 0)):
                 record['rules'][DESULFURASE_RULE] = 'true'
 
+    def find_nitric_oxide_direction(self, model_info, model):
+        from mqc.control.nitric_oxide_direction import nitric_oxide_direction, NO_RULE
+        for record in model_info['reactions']:
+            r = model.reactions.get_by_id(record['id'])
+            direction = nitric_oxide_direction(r)
+            if ((direction == 1 and r.lower_bound < 0) or
+                    (direction == -1 and r.upper_bound > 0)):
+                record['rules'][NO_RULE] = 'true'
+
     def initial_rule(self, model_info):
         """"""
         for rxn in model_info["reactions"]:
@@ -1159,5 +1168,6 @@ class Rules:
         self.find_biotin_synthesis_direction(model_info, model)
         self.find_deacetylase_direction(model_info, model)
         self.find_desulfurase_direction(model_info, model)
+        self.find_nitric_oxide_direction(model_info, model)
         self.find_incomplete_quinone_methylation(model_info, model)
         self.find_sugar_identity_conflicts(model_info, model)

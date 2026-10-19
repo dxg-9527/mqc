@@ -13,6 +13,7 @@ from mqc.control.biotin_direction import biotin_bounds, BIOTIN_RULE
 from mqc.control.deacetylase_direction import deacetylase_bounds, ACETATE_RULE
 from mqc.control.desulfurase_direction import desulfurase_bounds, DESULFURASE_RULE
 from mqc.control.quinone_methylation import methylation_bounds, METHYL_REDOX_RULE
+from mqc.control.nitric_oxide_direction import nitric_oxide_bounds, NO_RULE
 
 
 def enabled(cfg):
@@ -43,6 +44,7 @@ def apply_native_rules(model, info):
         for rule, policy in [(HYDROLYSIS_RULE, hydrolysis_bounds),
                              (BIOTIN_RULE, biotin_bounds), (ACETATE_RULE, deacetylase_bounds),
                              (DESULFURASE_RULE, desulfurase_bounds),
+                             (NO_RULE, nitric_oxide_bounds),
                              (METHYL_REDOX_RULE, methylation_bounds)]:
             if rule not in record.get('rules', {}):
                 continue
@@ -71,6 +73,7 @@ This changes ranking, not a claim that a review item is chemically valid.
         r.bounds = deacetylase_bounds(r)
         r.bounds = desulfurase_bounds(r)
         r.bounds = methylation_bounds(r)
+        r.bounds = nitric_oxide_bounds(r)
         assessment = assess_gapfill_chemistry(r)
         known_imbalance = bool(assessment['atom_imbalance']) or (
             assessment['charge_imbalance'] is not None and assessment['charge_imbalance'] != 0)

@@ -11,6 +11,15 @@ import traceback
 from common import REPO, STAGES, git_commit, sha, verify_release, write_json
 
 
+def load_exported_model(path):
+    import cobra
+    path = Path(path)
+    # MQC may export a valid SBML file named '.xml'; Path('.xml').suffix is empty.
+    if path.name.lower().endswith('.xml'):
+        return cobra.io.read_sbml_model(str(path))
+    return cobra.io.load_json_model(str(path))
+
+
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--input', type=Path, required=True)
@@ -19,15 +28,17 @@ def main():
     started=time.time()
     work=args.work.resolve()
     output=work/'output'
-    record=dict(status='started', started=started, git_commit=git_commit(),
-                release_lock_sha256=verify_release(), input_xml_sha256=sha(args.input),
+    record=dict(status='started', started=started,
                 mode='model_check2_only', experimental_values_used=False,
                 argv=[str(args.input),str(output)], stages=[])
     write_json(work/'outcome.json',record)
     sys.path.insert(0,str(REPO))
     try:
+        record.update(git_commit=git_commit(), release_lock_sha256=verify_release(),
+                      input_xml_sha256=sha(args.input))
+        write_json(work/'outcome.json', record)
         import cobra
-        from cobra.flux_analysis import pfba
+        from mqc.solver_utils import robust_pfba as pfba
         from cobra.util.solver import linear_reaction_coefficients
         from mqc.main import ModelCheck
         from mqc.control import initial_control,nadh_control,atp_control,net_control,yield_control,biomass_control
@@ -53,7 +64,7 @@ def main():
             raise RuntimeError('Correction returned without all six stages and final paths')
         exported=Path(result[1]).resolve()
         exported.relative_to(output)
-        model=cobra.io.read_sbml_model(str(exported)) if exported.suffix.lower()=='.xml' else cobra.io.load_json_model(str(exported))
+        model=load_exported_model(exported)
         control=json.loads((output/'control_result.json').read_text())
         if control.get('postgap_validation',{}).get('status') not in ('passed','repaired'):
             raise RuntimeError('Final post-gap validation did not pass')

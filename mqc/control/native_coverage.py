@@ -12,10 +12,12 @@ import re
 from pathlib import Path
 
 import cobra
+from cobra.exceptions import OptimizationError
 import pandas as pd
 from cobra.flux_analysis import flux_variability_analysis
 from cobra.medium import find_external_compartment
 from mqc.control.postgap_control import close_inputs, diagnose, discover_targets
+from mqc.solver_utils import solve_with_cold_retry
 
 
 def native_core_reactions(model, original_ids, biomass):
@@ -241,7 +243,11 @@ def select_native_coverage(model, big_model, info, directory):
         return finish('no_blocked_native_reactions')
     search.objective = 'EX_gap'
     search.objective_direction = 'max'
-    primary = search.slim_optimize(error_value=None)
+    try:
+        search, primary, report['precursor_solver'] = solve_with_cold_retry(search)
+    except OptimizationError as error:
+        report['precursor_solver'] = dict(status='unresolved', error=repr(error))
+        return finish('skipped_unresolved_original_precursor_solve')
     if not math.isfinite(primary) or primary <= 1e-7:
         return finish('skipped_infeasible_original_precursor_target')
     report['precursor_optimum_preserved'] = primary

@@ -240,12 +240,16 @@ class ModelCheck:
             write_model_info(model_pre_process.model_info, self.cfg)
             raise
         except RuntimeError as e:
+            self.model_control_info['final_model_status'] = 'correction_failed'
+            self.model_control_info['correction_error'] = repr(e)
             final_model = write_final_model(controler.model, self.cfg, self.model_file)
             check_model = write_check_model(
                 controler.check_model, self.cfg, self.model_file
             )
             model_control_infos = write_result2(self.model_control_info, self.cfg)
             print(repr(e), ".............")
+            write_model_info(model_pre_process.model_info, self.cfg)
+            raise
 
         except Exception as e:
             model_control_infos = write_result2(self.model_control_info, self.cfg)

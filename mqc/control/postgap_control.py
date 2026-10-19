@@ -1,7 +1,10 @@
 """Conservative, experiment-independent validation after biomass gap filling.
 
 Checks source-free dissipation of recognized cytosolic energy/redox carriers.
-Only newly gap-filled reaction directions may be restricted. Repairs must
+Newly gap-filled directions are tried first. If none preserve growth, one
+existing witnessed direction may be restricted only if ALL available carrier
+tests then pass. This is an explicit network repair, not an enzyme assignment.
+Repairs must
 preserve growth viability in the unchanged, stored QC medium; an optimum
 inflated by a witnessed source-free cycle is not a conservation target. This is
 a bounded greedy safeguard, not a thermodynamic proof or a minimum-edit solver.
@@ -12,7 +15,7 @@ import math
 from pathlib import Path
 
 from cobra import Reaction
-from cobra.flux_analysis import pfba
+from mqc.solver_utils import robust_pfba as pfba
 from mqc.control.growth_environment import validate_growth_environment
 
 
@@ -167,17 +170,21 @@ def _growth_viable(before, after, tolerance):
 
 
 def validate_and_repair(model, biomass_id, gapfill_ids, pre_gapfill_ids,
-                        tolerance=1e-7, max_edits=24):
+                        tolerance=1e-7, max_edits=24, reaction_evidence=None):
     """Transactional guard: failed validation never leaves partial repairs.
 
     Greedily block a witnessed direction of a *newly added* gap reaction.
+    A bounded original-network fallback is allowed only when new directions
+    cannot preserve growth, the witness contains a new gap reaction, and a
+    single old-direction cut resolves every available energy/redox target.
     Prefer the largest reduction in the current cycle diagnostic; ties use ID.
     Parallel cycles can retain the capped objective, so strict improvement is
     not required. Every accepted step removes a witnessed feasible direction.
     """
     targets, coverage = discover_targets(model)
     eligible = sorted((set(gapfill_ids) - set(pre_gapfill_ids)) & set(model.reactions.list_attr("id")))
-    report = {"schema_version": 1, "status": "failed", "tolerance": tolerance,
+    evidence = {r['id']: r for r in (reaction_evidence or [])}
+    report = {"schema_version": 2, "status": "failed", "tolerance": tolerance,
               "diagnostic_drain_cap": 1000, "coverage": coverage,
               "scope": "recognized cytosolic carriers; no full thermodynamic guarantee",
               "eligible_new_gap_reactions": eligible, "attempts": [], "repairs": [],
@@ -254,8 +261,55 @@ def validate_and_repair(model, biomass_id, gapfill_ids, pre_gapfill_ids,
                             feasible.append(trial)
                 attempt["candidates"].append(trial)
             if not feasible:
-                report["reason"] = "no_growth_preserving_new_gap_direction"
-                break
+                # A new gap reaction can complete a cycle involving old
+                # transporters. Do not repeatedly try the same lethal new cut.
+                # All existing alternatives are reported; no phenotype or
+                # reaction-ID whitelist is consulted.
+                witnessed = diagnostic.get('witness', [])
+                fallback = []
+                if any(row['reaction_id'] in eligible for row in witnessed):
+                    for row in sorted(witnessed, key=lambda x: x['reaction_id']):
+                        rid = row['reaction_id']
+                        if rid in eligible or rid == biomass_id or rid not in pre_gapfill_ids:
+                            continue
+                        reaction = model.reactions.get_by_id(rid)
+                        lb, ub = reaction.bounds
+                        if len(reaction.metabolites) <= 1 or not lb <= 0 <= ub:
+                            continue
+                        bounds = (lb, 0) if row['flux'] > 0 else (0, ub)
+                        if bounds == reaction.bounds:
+                            continue
+                        trial = dict(reaction_id=rid, old_bounds=[lb, ub], new_bounds=list(bounds),
+                            blocked_direction='forward' if row['flux'] > 0 else 'reverse',
+                            scope='existing_cycle_direction',
+                            net_penalty_points=evidence.get(rid, {}).get('net_penalty_points', 0),
+                            has_gpr=bool(reaction.gene_reaction_rule.strip()),
+                            removes_entire_reaction=bounds == (0, 0))
+                        with model:
+                            reaction.bounds = bounds
+                            trial['growth'] = _growth(model, biomass_id)
+                            trial['growth_preserved'] = _growth_viable(growth_before, trial['growth'], tolerance)
+                            if trial['growth_preserved']:
+                                trial['all_target_checks'] = [diagnose(model, t, tolerance) for t in targets]
+                                if all(d['passed'] for d in trial['all_target_checks']):
+                                    fallback.append(trial)
+                        attempt['candidates'].append(trial)
+                if not fallback:
+                    report['reason'] = 'no_growth_preserving_safe_cycle_direction'
+                    break
+                # Higher original penalties first, then preserve gene-supported
+                # reactions and avoid full deletions; use stored-medium growth
+                # only as a final tie-breaker, never experimental growth values.
+                chosen = min(fallback, key=lambda x: (-float(x['net_penalty_points']),
+                    x['has_gpr'], x['removes_entire_reaction'],
+                    -x['growth']['value'], x['reaction_id']))
+                attempt['fallback_policy'] = 'single_existing_cut_all_targets_pass'
+                attempt['safe_alternatives'] = [r['reaction_id'] for r in fallback]
+                attempt['chosen_reaction'] = chosen['reaction_id']
+                model.reactions.get_by_id(chosen['reaction_id']).bounds = tuple(chosen['new_bounds'])
+                proposed.append(chosen)
+                checks = chosen['all_target_checks']
+                continue
             chosen = min(feasible, key=lambda x: (round(x["cycle_after"]["value"], 7), x["reaction_id"]))
             model.reactions.get_by_id(chosen["reaction_id"]).bounds = tuple(chosen["new_bounds"])
             proposed.append(chosen)
@@ -277,7 +331,8 @@ def run_postgap_control(model_info, model, model_control_info, cfg, pre_gapfill_
     try:
         environment = validate_growth_environment(model, getattr(cfg, "growth_environment", "preserve"))
         report = validate_and_repair(model, model_info.get("initial_rxn", {}).get("biomass_rxn_id"),
-                                     model_info.get("gaped_rxn", []), pre_gapfill_ids)
+                                     model_info.get("gaped_rxn", []), pre_gapfill_ids,
+                                     reaction_evidence=model_info.get('reactions', []))
         report["growth_environment"] = environment
     except Exception as error:
         # Trials are protected by model contexts; never swallow an unknown error

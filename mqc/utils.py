@@ -6,7 +6,7 @@ import json
 import cobra
 import d3flux
 from cobra.util.solver import linear_reaction_coefficients
-from cobra.flux_analysis import pfba
+from mqc.solver_utils import robust_pfba as pfba, exceeds_yield_limit
 from cobra.io.dict import model_to_dict
 import time
 import logging
@@ -600,7 +600,7 @@ def max_reduced_degree_rate(model, metId, model_info):
                 if mets.id not in O2 and mets.name not in O2_NAME:
                     for k in ["S", "C", "H", "O", "P"]:
                         if k in mets.elements.keys():
-                            met_degree += -(round(v, 5)) * reduced_degree(
+                            met_degree += -float(v) * reduced_degree(
                                 model, all_mets[0]
                             )
 
@@ -2780,14 +2780,15 @@ def keep_decimal_places(reaction):
     equation_rounded = f"{reactant_str} {arrow} {product_str}"
     reactant_str_id = " + ".join(
         [
-            f"{format(abs(coefficient), '.3e')} {metabolite.id}"
+            # COBRA splits reaction strings on '+', including positive exponents.
+            f"{format(abs(coefficient), '.3e').replace('e+', 'e')} {metabolite.id}"
             for metabolite, coefficient in reaction.metabolites.items()
             if coefficient < 0
         ]
     )
     product_str_id = " + ".join(
         [
-            f"{format(abs(coefficient), '.3e')} {metabolite.id}"
+            f"{format(abs(coefficient), '.3e').replace('e+', 'e')} {metabolite.id}"
             for metabolite, coefficient in reaction.metabolites.items()
             if coefficient > 0
         ]
