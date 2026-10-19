@@ -1,0 +1,920 @@
+{
+  "release": "optimized-cluster-plateau-fixes-20261019",
+  "parent_commit": "f40644d36212bbe4ea659ccc3d1ff9421b1bbe8f",
+  "release_lock_sha256": "84f73f502d9934db975093ab71266eea434687521699eec80931f4749ad82e28",
+  "unit_tests_passed": 32,
+  "cluster_tests_passed": 8,
+  "test_processes_successful": true,
+  "full_workflows": [
+    {
+      "job_id": "carveme_000047",
+      "status": "completed",
+      "previous_status": "failed",
+      "previous_error": "PostGapValidationError('Final post-gapfill validation failed: no_growth_preserving_safe_cycle_direction')",
+      "seconds": 515.1864597797394,
+      "growth": 0.7614137832587843,
+      "error": null,
+      "input_sha256": "1f57f02c739895c1e1334bfd7a4a28e31d3090b7acd8077e2108bbba68680eb1",
+      "xml_sha256": "711d2a876ea07ce41a4eaa8906520279b0a167da95cea9d5200574a201f8d4f8",
+      "energy_targets": 11,
+      "all_targets_passed": true,
+      "edits": [
+        "GLUt2r",
+        "PROt2r",
+        "NI2tex",
+        "Zn2tex",
+        "Ktex"
+      ],
+      "Sv": 7.282131982925405e-14,
+      "bound_residual": 6.827871601444713e-13,
+      "plateau_used": true
+    },
+    {
+      "job_id": "carveme_000265",
+      "status": "completed",
+      "previous_status": "completed",
+      "previous_error": "",
+      "seconds": 334.57712626457214,
+      "growth": 0.4975706357794973,
+      "error": null,
+      "input_sha256": "126d200a7d912d6a24ba80cea49007978d6341a9950dead8725c994b3b1dc0c6",
+      "xml_sha256": "b34258e1664ce6dfddcf12675e38f59dd0c8d0eefb0c074b7c1d8a2c64b65605",
+      "energy_targets": 11,
+      "all_targets_passed": true,
+      "edits": [
+        "PROt2r",
+        "PIt2r"
+      ],
+      "Sv": 2.853273173286652e-14,
+      "bound_residual": 2.5366375666635577e-12,
+      "plateau_used": false,
+      "previous_growth": 0.4975706357794973,
+      "growth_difference": 0.0
+    },
+    {
+      "job_id": "carveme_003155",
+      "status": "completed",
+      "previous_status": "failed",
+      "previous_error": "PostGapValidationError('Final post-gapfill validation failed: existing_direction_budget_exhausted')",
+      "seconds": 319.48018765449524,
+      "growth": 0.632986827041254,
+      "error": null,
+      "input_sha256": "0a87c0984826bee8e00c9f0fddf5734e9ff4773f750729f25ac3ac306e327bec",
+      "xml_sha256": "ea093355a0ebd3a0ca690b7108c2c9ae3fa66bc88e2089250b44d27e06283517",
+      "energy_targets": 11,
+      "all_targets_passed": true,
+      "edits": [
+        "CITtex",
+        "GLUt2r",
+        "PROt2r",
+        "ALAt2r",
+        "NAtex"
+      ],
+      "Sv": 2.6283662746262593e-14,
+      "bound_residual": 0.0,
+      "plateau_used": false
+    },
+    {
+      "job_id": "carveme_005349",
+      "status": "completed",
+      "previous_status": "failed",
+      "previous_error": "PostGapValidationError('Final post-gapfill validation failed: existing_direction_budget_exhausted')",
+      "seconds": 500.61326789855957,
+      "growth": 0.4907917409510884,
+      "error": null,
+      "input_sha256": "5393bdf12b79220c4dc4e105b54726d0c81c30f1bbcf32b7112f6dcae3c32fac",
+      "xml_sha256": "a57b62fd5d331a7d8cbb0d3937a639b09016e282b83a30774abf570adc9b77a8",
+      "energy_targets": 11,
+      "all_targets_passed": true,
+      "edits": [
+        "NKCC2t",
+        "COBALTt5",
+        "PROt2r",
+        "NAtex",
+        "ALAt2r",
+        "GLUt2r"
+      ],
+      "Sv": 9.302899162816347e-14,
+      "bound_residual": 0.0,
+      "plateau_used": false
+    },
+    {
+      "job_id": "vmh_005822",
+      "status": "completed",
+      "previous_status": "completed",
+      "previous_error": "",
+      "seconds": 536.8200116157532,
+      "growth": 0.48492061274728754,
+      "error": null,
+      "input_sha256": "80c939c96016d3759f326f597e4187d63b25598654b90189710f1700009d49d7",
+      "xml_sha256": "ebd14caed589955c5c1b36e5c4d9045bfeb9cfa0b0a0c6f398008cba51df8955",
+      "energy_targets": 10,
+      "all_targets_passed": true,
+      "edits": [],
+      "Sv": 1.3128387266192476e-14,
+      "bound_residual": 1.566746732351021e-12,
+      "plateau_used": false,
+      "previous_growth": 0.48492061274728754,
+      "growth_difference": 0.0
+    }
+  ],
+  "checkpoint_tests": [
+    {
+      "job_id": "carveme_000091",
+      "status": "repaired",
+      "reason": "all_available_targets_passed",
+      "growth": 0.5179177702013203,
+      "energy_targets": 11,
+      "all_targets_passed": true,
+      "adopted_edits": [
+        "NI2tex",
+        "Zn2tex",
+        "Ktex"
+      ],
+      "trial_changes_rolled_back": null,
+      "plateau_used": true
+    },
+    {
+      "job_id": "carveme_000877",
+      "status": "repaired",
+      "reason": "all_available_targets_passed",
+      "growth": 0.7818727077883323,
+      "energy_targets": 11,
+      "all_targets_passed": true,
+      "adopted_edits": [
+        "CITtex",
+        "ALAt2r",
+        "GLUt2r",
+        "NAtex",
+        "PROt2r"
+      ],
+      "trial_changes_rolled_back": null,
+      "plateau_used": false
+    },
+    {
+      "job_id": "carveme_001158",
+      "status": "repaired",
+      "reason": "all_available_targets_passed",
+      "growth": 0.4035850907901184,
+      "energy_targets": 10,
+      "all_targets_passed": true,
+      "adopted_edits": [
+        "ALAt2r",
+        "COBALTt5",
+        "add_ATPS4_e",
+        "add_ATPS4rpp_p"
+      ],
+      "trial_changes_rolled_back": null,
+      "plateau_used": true
+    },
+    {
+      "job_id": "carveme_002447",
+      "status": "repaired",
+      "reason": "all_available_targets_passed",
+      "growth": 0.22494581384460482,
+      "energy_targets": 11,
+      "all_targets_passed": true,
+      "adopted_edits": [
+        "Mn2t",
+        "COBALTt5",
+        "ALAt2r",
+        "NAtex",
+        "PROt2r",
+        "GLUt2r"
+      ],
+      "trial_changes_rolled_back": null,
+      "plateau_used": false
+    },
+    {
+      "job_id": "carveme_003514",
+      "status": "repaired",
+      "reason": "all_available_targets_passed",
+      "growth": 0.6008386997393168,
+      "energy_targets": 11,
+      "all_targets_passed": true,
+      "adopted_edits": [
+        "CITtex",
+        "ALAt2r",
+        "GLUt2r",
+        "NAtex",
+        "PROt2r"
+      ],
+      "trial_changes_rolled_back": null,
+      "plateau_used": false
+    }
+  ],
+  "independent_export_checks": [
+    {
+      "job_id": "carveme_000047",
+      "growth": 0.7614137832587843,
+      "status": "optimal",
+      "energy_checks": [
+        {
+          "target": "ATP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "CTP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "GTP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "UTP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "ITP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "NADH@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "NADPH@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "FADH2@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "FMNH2@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "Q8H2@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "MQL8@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        }
+      ],
+      "xml_sha256": "711d2a876ea07ce41a4eaa8906520279b0a167da95cea9d5200574a201f8d4f8",
+      "pfba_mass_residual": 7.282131982925405e-14,
+      "bound_residual": 6.827871601444713e-13,
+      "recomputed_pfba_mass_residual": 2.842170943040401e-14,
+      "recomputed_bound_residual": 1.9673151996357774e-13,
+      "unavailable_targets": [
+        {
+          "target": "DMMQL8@C_c",
+          "issues": {
+            "dmmql8": "missing",
+            "dmmq8": "missing"
+          }
+        }
+      ]
+    },
+    {
+      "job_id": "carveme_000265",
+      "growth": 0.4975706357794973,
+      "status": "optimal",
+      "energy_checks": [
+        {
+          "target": "ATP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "CTP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "GTP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "UTP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "ITP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "NADH@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "NADPH@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "FADH2@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "FMNH2@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "Q8H2@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "MQL8@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        }
+      ],
+      "xml_sha256": "b34258e1664ce6dfddcf12675e38f59dd0c8d0eefb0c074b7c1d8a2c64b65605",
+      "pfba_mass_residual": 2.853273173286652e-14,
+      "bound_residual": 2.5366375666635577e-12,
+      "recomputed_pfba_mass_residual": 5.648259637780484e-14,
+      "recomputed_bound_residual": 0.0,
+      "unavailable_targets": [
+        {
+          "target": "DMMQL8@C_c",
+          "issues": {
+            "dmmql8": "missing",
+            "dmmq8": "missing"
+          }
+        }
+      ]
+    },
+    {
+      "job_id": "carveme_003155",
+      "growth": 0.632986827041254,
+      "status": "optimal",
+      "energy_checks": [
+        {
+          "target": "ATP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "CTP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "GTP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "UTP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "ITP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "NADH@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "NADPH@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "FADH2@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "FMNH2@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "Q8H2@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "MQL8@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        }
+      ],
+      "xml_sha256": "ea093355a0ebd3a0ca690b7108c2c9ae3fa66bc88e2089250b44d27e06283517",
+      "pfba_mass_residual": 2.6283662746262593e-14,
+      "bound_residual": 0.0,
+      "recomputed_pfba_mass_residual": 5.470347482286475e-14,
+      "recomputed_bound_residual": 0.0,
+      "unavailable_targets": [
+        {
+          "target": "DMMQL8@C_c",
+          "issues": {
+            "dmmql8": "missing",
+            "dmmq8": "missing"
+          }
+        },
+        {
+          "target": "ATP@c",
+          "issues": {
+            "atp": "missing",
+            "h2o": "missing",
+            "adp": "missing",
+            "h": "missing",
+            "pi": "missing"
+          }
+        },
+        {
+          "target": "CTP@c",
+          "issues": {
+            "ctp": "missing",
+            "h2o": "missing",
+            "cdp": "missing",
+            "h": "missing",
+            "pi": "missing"
+          }
+        },
+        {
+          "target": "GTP@c",
+          "issues": {
+            "gtp": "missing",
+            "h2o": "missing",
+            "gdp": "missing",
+            "h": "missing",
+            "pi": "missing"
+          }
+        },
+        {
+          "target": "UTP@c",
+          "issues": {
+            "utp": "missing",
+            "h2o": "missing",
+            "udp": "missing",
+            "h": "missing",
+            "pi": "missing"
+          }
+        },
+        {
+          "target": "ITP@c",
+          "issues": {
+            "itp": "missing",
+            "h2o": "missing",
+            "idp": "missing",
+            "h": "missing",
+            "pi": "missing"
+          }
+        },
+        {
+          "target": "NADH@c",
+          "issues": {
+            "nadh": "missing",
+            "nad": "missing",
+            "h": "missing"
+          }
+        },
+        {
+          "target": "NADPH@c",
+          "issues": {
+            "nadph": "missing",
+            "nadp": "missing",
+            "h": "missing"
+          }
+        },
+        {
+          "target": "FADH2@c",
+          "issues": {
+            "fadh2": "missing",
+            "fad": "missing",
+            "h": "missing"
+          }
+        },
+        {
+          "target": "FMNH2@c",
+          "issues": {
+            "fmnh2": "missing",
+            "fmn": "missing",
+            "h": "missing"
+          }
+        },
+        {
+          "target": "Q8H2@c",
+          "issues": {
+            "q8h2": "missing",
+            "q8": "missing",
+            "h": "missing"
+          }
+        },
+        {
+          "target": "MQL8@c",
+          "issues": {
+            "mql8": "missing",
+            "mqn8": "missing",
+            "h": "missing"
+          }
+        },
+        {
+          "target": "DMMQL8@c",
+          "issues": {
+            "dmmql8": "missing",
+            "dmmq8": "missing",
+            "h": "missing"
+          }
+        }
+      ]
+    },
+    {
+      "job_id": "carveme_005349",
+      "growth": 0.4907917409510884,
+      "status": "optimal",
+      "energy_checks": [
+        {
+          "target": "ATP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "CTP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "GTP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "UTP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "ITP@C_c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "NADH@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "NADPH@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "FADH2@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "FMNH2@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "Q8H2@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "MQL8@C_c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        }
+      ],
+      "xml_sha256": "a57b62fd5d331a7d8cbb0d3937a639b09016e282b83a30774abf570adc9b77a8",
+      "pfba_mass_residual": 9.302899162816347e-14,
+      "bound_residual": 0.0,
+      "recomputed_pfba_mass_residual": 8.526512829121202e-14,
+      "recomputed_bound_residual": 0.0,
+      "unavailable_targets": [
+        {
+          "target": "DMMQL8@C_c",
+          "issues": {
+            "dmmql8": "missing",
+            "dmmq8": "missing"
+          }
+        },
+        {
+          "target": "ATP@c",
+          "issues": {
+            "atp": "missing",
+            "h2o": "missing",
+            "adp": "missing",
+            "h": "missing",
+            "pi": "missing"
+          }
+        },
+        {
+          "target": "CTP@c",
+          "issues": {
+            "ctp": "missing",
+            "h2o": "missing",
+            "cdp": "missing",
+            "h": "missing",
+            "pi": "missing"
+          }
+        },
+        {
+          "target": "GTP@c",
+          "issues": {
+            "gtp": "missing",
+            "h2o": "missing",
+            "gdp": "missing",
+            "h": "missing",
+            "pi": "missing"
+          }
+        },
+        {
+          "target": "UTP@c",
+          "issues": {
+            "utp": "missing",
+            "h2o": "missing",
+            "udp": "missing",
+            "h": "missing",
+            "pi": "missing"
+          }
+        },
+        {
+          "target": "ITP@c",
+          "issues": {
+            "itp": "missing",
+            "h2o": "missing",
+            "idp": "missing",
+            "h": "missing",
+            "pi": "missing"
+          }
+        },
+        {
+          "target": "NADH@c",
+          "issues": {
+            "nadh": "missing",
+            "nad": "missing",
+            "h": "missing"
+          }
+        },
+        {
+          "target": "NADPH@c",
+          "issues": {
+            "nadph": "missing",
+            "nadp": "missing",
+            "h": "missing"
+          }
+        },
+        {
+          "target": "FADH2@c",
+          "issues": {
+            "fadh2": "missing",
+            "fad": "missing",
+            "h": "missing"
+          }
+        },
+        {
+          "target": "FMNH2@c",
+          "issues": {
+            "fmnh2": "missing",
+            "fmn": "missing",
+            "h": "missing"
+          }
+        },
+        {
+          "target": "Q8H2@c",
+          "issues": {
+            "q8h2": "missing",
+            "q8": "missing",
+            "h": "missing"
+          }
+        },
+        {
+          "target": "MQL8@c",
+          "issues": {
+            "mql8": "missing",
+            "mqn8": "missing",
+            "h": "missing"
+          }
+        },
+        {
+          "target": "DMMQL8@c",
+          "issues": {
+            "dmmql8": "missing",
+            "dmmq8": "missing",
+            "h": "missing"
+          }
+        }
+      ]
+    },
+    {
+      "job_id": "vmh_005822",
+      "growth": 0.48492061274728754,
+      "status": "optimal",
+      "energy_checks": [
+        {
+          "target": "ATP@c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "CTP@c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "GTP@c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "UTP@c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "ITP@c",
+          "group": "energy",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "NADH@c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "NADPH@c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "FMNH2@c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "Q8H2@c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        },
+        {
+          "target": "MQL8@c",
+          "group": "redox",
+          "value": 0.0,
+          "solver_status": "optimal",
+          "passed": true
+        }
+      ],
+      "xml_sha256": "ebd14caed589955c5c1b36e5c4d9045bfeb9cfa0b0a0c6f398008cba51df8955",
+      "pfba_mass_residual": 1.3128387266192476e-14,
+      "bound_residual": 1.566746732351021e-12,
+      "recomputed_pfba_mass_residual": 3.3056890558214036e-14,
+      "recomputed_bound_residual": 2.0729945537922845e-16,
+      "unavailable_targets": [
+        {
+          "target": "FADH2@c",
+          "issues": {
+            "fadh2": "missing"
+          }
+        },
+        {
+          "target": "DMMQL8@c",
+          "issues": {
+            "dmmql8": "missing",
+            "dmmq8": "missing"
+          }
+        }
+      ]
+    }
+  ],
+  "cluster_scope": "Local bounded regression only; neither 213 nor 6543 rerun here",
+  "unchanged_unresolved_class": "Nine ETHAP-associated yield failures not forcibly repaired",
+  "source_tree_tested_before_commit": true,
+  "validation_environment": {
+    "python": "3.8.16",
+    "cobra": "0.29.1",
+    "solver": "CPLEX 22.1.0.0",
+    "image_sha256": "ad8db5506ca09a5c4e0a62c711ece6ab633c02403a534502c1e7458e540889ae",
+    "network": "none",
+    "source_mount": "read_only"
+  }
+}

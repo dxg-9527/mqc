@@ -171,15 +171,19 @@ def _growth_viable(before, after, tolerance):
 
 def validate_and_repair(model, biomass_id, gapfill_ids, pre_gapfill_ids,
                         tolerance=1e-7, max_edits=24, reaction_evidence=None,
-                        max_existing_edits=4):
+                        max_existing_edits=8, max_plateau_trials=12):
     """Transactional guard: failed validation never leaves partial repairs.
 
     Greedily block a witnessed direction of a *newly added* gap reaction.
     A bounded original-network fallback is allowed only when new directions
     cannot preserve growth, the witness contains a new gap reaction, and a
     bounded sequence resolves every available energy/redox target. Single-cut
-    solutions are preferred. Partial old-network steps must reduce the current
-    cycle and must not reactivate an already-passed carrier diagnostic.
+    solutions are preferred. Partial old-network steps normally reduce the
+    current cycle and must not reactivate an already-passed diagnostic. Only
+    after that search stalls, try at most max_plateau_trials witnessed existing
+    directions whose individual cut leaves the maximum unchanged. Each branch
+    gets a greedy completion with plateau search disabled and the remaining
+    edit budgets. Accept a branch only when ALL tests pass with positive growth.
     Prefer the largest reduction in the current cycle diagnostic; ties use ID.
     Parallel cycles can retain the capped objective, so strict improvement is
     not required. Every accepted step removes a witnessed feasible direction.
@@ -187,13 +191,15 @@ def validate_and_repair(model, biomass_id, gapfill_ids, pre_gapfill_ids,
     targets, coverage = discover_targets(model)
     eligible = sorted((set(gapfill_ids) - set(pre_gapfill_ids)) & set(model.reactions.list_attr("id")))
     evidence = {r['id']: r for r in (reaction_evidence or [])}
-    report = {"schema_version": 3, "status": "failed", "tolerance": tolerance,
+    report = {"schema_version": 4, "status": "failed", "tolerance": tolerance,
               "diagnostic_drain_cap": 1000, "coverage": coverage,
               "scope": "recognized cytosolic carriers; no full thermodynamic guarantee",
               "eligible_new_gap_reactions": eligible, "attempts": [], "repairs": [],
               "before": [], "after": [], "experimental_data_used": False,
               "growth_acceptance_policy": "positive_growth_not_cycle_inflated_optimum",
               "max_existing_direction_edits": max_existing_edits,
+              "max_plateau_trials": max_plateau_trials,
+              "plateau_search_depth": 1,
               "growth_status": "not_tested", "energy_status": "not_tested"}
     if not biomass_id or biomass_id not in model.reactions:
         report["reason"] = "missing_biomass_objective"
@@ -276,7 +282,7 @@ def validate_and_repair(model, biomass_id, gapfill_ids, pre_gapfill_ids,
                 # All existing alternatives are reported; no phenotype or
                 # reaction-ID whitelist is consulted.
                 witnessed = diagnostic.get('witness', [])
-                fallback, partial = [], []
+                fallback, partial, plateau = [], [], []
                 if sum(r.get('scope') == 'existing_cycle_direction' for r in proposed) >= max_existing_edits:
                     report['reason'] = 'existing_direction_budget_exhausted'
                     break
@@ -316,16 +322,74 @@ def validate_and_repair(model, biomass_id, gapfill_ids, pre_gapfill_ids,
                                     if (valid and no_reactivated and current['value'] < diagnostic['value'] - tolerance):
                                         trial['current_cycle_after'] = current['value']
                                         partial.append(trial)
+                                    elif (valid and no_reactivated and
+                                          abs(current['value'] - diagnostic['value']) <= tolerance):
+                                        plateau.append(trial)
                         attempt['candidates'].append(trial)
-                if not fallback and not partial:
-                    report['reason'] = 'no_growth_preserving_safe_cycle_direction'
-                    break
                 # Higher original penalties first, then preserve gene-supported
                 # reactions and avoid full deletions; use stored-medium growth
                 # only as a final tie-breaker, never experimental growth values.
                 ranking = lambda x: (-float(x['net_penalty_points']),
                     x['has_gpr'], x['removes_entire_reaction'],
                     -x['growth']['value'], x['reaction_id'])
+                if not fallback and not partial:
+                    attempt['plateau_alternatives'] = [r['reaction_id'] for r in plateau]
+                    search = dict(trials=[], max_trials=max_plateau_trials,
+                                  status='no_safe_completion', recursive_plateau_search=False)
+                    attempt['plateau_search'] = search
+                    completed = []
+                    # Stable priority within numerical growth ties. Candidate
+                    # generation is witness-based, never an ID/strain whitelist.
+                    plateau_rank = lambda x: (-float(x['net_penalty_points']),
+                        x['has_gpr'], x['removes_entire_reaction'],
+                        -round(x['growth']['value'], 7), x['reaction_id'])
+                    remaining_existing = max_existing_edits - sum(
+                        r.get('scope') == 'existing_cycle_direction' for r in proposed) - 1
+                    remaining_total = max_edits - len(proposed) - 1
+                    for candidate in sorted(plateau, key=plateau_rank)[:max(0, max_plateau_trials)]:
+                        if remaining_existing < 0 or remaining_total < 0:
+                            break
+                        with model:
+                            model.reactions.get_by_id(candidate['reaction_id']).bounds = tuple(candidate['new_bounds'])
+                            completion = validate_and_repair(
+                                model, biomass_id, gapfill_ids, pre_gapfill_ids,
+                                tolerance=tolerance, max_edits=remaining_total,
+                                reaction_evidence=reaction_evidence,
+                                max_existing_edits=remaining_existing, max_plateau_trials=0)
+                            branch = dict(first_reaction=candidate['reaction_id'],
+                                first_change=candidate, completion=completion)
+                            search['trials'].append(branch)
+                            if (completion['status'] != 'failed' and
+                                all(d['passed'] for d in completion['after']) and
+                                _growth_viable(growth_before, completion['growth_after_trial'], tolerance)):
+                                completed.append(branch)
+                    search['tested'] = len(search['trials'])
+                    search['untested_candidates'] = len(plateau) - search['tested']
+                    if not completed:
+                        report['reason'] = 'no_growth_preserving_safe_cycle_direction'
+                        break
+                    # Compare only fully validated branches. Preserve the larger
+                    # viable QC-medium growth, then prefer fewer destructive edits.
+                    # No experimental rates and no cycle-inflated growth target.
+                    def completion_rank(branch):
+                        changes = [branch['first_change']] + branch['completion']['repairs']
+                        return (-round(branch['completion']['growth_after_trial']['value'], 7),
+                                sum(c.get('removes_entire_reaction', False) for c in changes),
+                                sum(c.get('has_gpr', False) for c in changes), len(changes),
+                                tuple(c['reaction_id'] for c in changes))
+                    winner = min(completed, key=completion_rank)
+                    changes = [winner['first_change']] + winner['completion']['repairs']
+                    for change in changes:
+                        model.reactions.get_by_id(change['reaction_id']).bounds = tuple(change['new_bounds'])
+                    proposed.extend(changes)
+                    report['after'] = winner['completion']['after']
+                    report['status'] = 'repaired'
+                    report['reason'] = 'all_available_targets_passed'
+                    search['status'] = 'validated_completion'
+                    search['selected_first_reaction'] = winner['first_reaction']
+                    attempt['fallback_policy'] = 'bounded_plateau_completion_all_targets_pass'
+                    attempt['chosen_reaction'] = winner['first_reaction']
+                    break
                 chosen = (min(fallback, key=ranking) if fallback else
                           min(partial, key=lambda x: (round(x['current_cycle_after'], 7), ranking(x))))
                 attempt['fallback_policy'] = ('single_existing_cut_all_targets_pass' if fallback else

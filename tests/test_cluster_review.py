@@ -126,6 +126,90 @@ class ReviewTests(unittest.TestCase):
         self.assertEqual(result['energy_status'],'passed')
         self.assertEqual(result['growth_status'],'nonpositive_or_unsolved')
 
+    def plateau_fixture(self):
+        model, target, diagnose, growth = self.guard_fixture()
+        def parallel(m, t, tolerance=1e-7, witness=False):
+            result = diagnose(m, t, tolerance, witness)
+            result['value'] = 1 if result['value'] else 0
+            return result
+        return model, target, parallel, growth
+
+    def test_plateau_combo_commits_only_complete_sequence(self):
+        model, target, diagnose, growth = self.plateau_fixture()
+        with mock.patch.object(guard, 'discover_targets', return_value=([target], [])), \
+             mock.patch.object(guard, 'diagnose', side_effect=diagnose), \
+             mock.patch.object(guard, '_growth', side_effect=growth):
+            result = guard.validate_and_repair(model, 'biomass', ['new_gap'],
+                {'biomass','old1','old2'}, max_existing_edits=2)
+        self.assertEqual(result['status'], 'repaired')
+        self.assertEqual(len(result['repairs']), 2)
+        self.assertEqual(model.reactions.new_gap.bounds, (0, 1000))
+        self.assertEqual(model.reactions.old1.lower_bound, 0)
+        self.assertEqual(model.reactions.old2.lower_bound, 0)
+        search = result['attempts'][0]['plateau_search']
+        self.assertEqual(search['status'], 'validated_completion')
+        self.assertTrue(all(t['completion']['max_plateau_trials'] == 0 for t in search['trials']))
+
+    def test_plateau_disabled_or_budget_insufficient_restores_all_bounds(self):
+        for kwargs in [dict(max_plateau_trials=0), dict(max_existing_edits=1), dict(max_edits=1)]:
+            model, target, diagnose, growth = self.plateau_fixture()
+            before = {r.id:r.bounds for r in model.reactions}
+            with mock.patch.object(guard, 'discover_targets', return_value=([target], [])), \
+                 mock.patch.object(guard, 'diagnose', side_effect=diagnose), \
+                 mock.patch.object(guard, '_growth', side_effect=growth):
+                result = guard.validate_and_repair(model, 'biomass', ['new_gap'],
+                    {'biomass','old1','old2'}, **kwargs)
+            self.assertEqual(result['status'], 'failed')
+            self.assertEqual(result['repairs'], [])
+            self.assertTrue(result['trial_changes_rolled_back'])
+            self.assertEqual(before, {r.id:r.bounds for r in model.reactions})
+
+    def test_plateau_trial_limit_is_respected(self):
+        model, target, diagnose, growth = self.plateau_fixture()
+        with mock.patch.object(guard, 'discover_targets', return_value=([target], [])), \
+             mock.patch.object(guard, 'diagnose', side_effect=diagnose), \
+             mock.patch.object(guard, '_growth', side_effect=growth):
+            result = guard.validate_and_repair(model, 'biomass', ['new_gap'],
+                {'biomass','old1','old2'}, max_plateau_trials=1)
+        search = result['attempts'][0]['plateau_search']
+        self.assertEqual(search['tested'], 1)
+        self.assertEqual(search['untested_candidates'], 1)
+        self.assertEqual(result['status'], 'repaired')
+
+    def test_plateau_cannot_reactivate_a_passed_carrier(self):
+        model, target, diagnose, growth = self.plateau_fixture()
+        redox = dict(target='NADH@c', carrier='NADH', group='redox')
+        before = {r.id:r.bounds for r in model.reactions}
+        def checks(m, t, tolerance=1e-7, witness=False):
+            if t['target'] == 'ATP@c':
+                return diagnose(m,t,tolerance,witness)
+            activated = any(m.reactions.get_by_id(r).lower_bound == 0 for r in ('old1','old2'))
+            return dict(target=t['target'], group='redox', value=int(activated),
+                        passed=not activated, solver_status='optimal')
+        with mock.patch.object(guard, 'discover_targets', return_value=([target,redox], [])), \
+             mock.patch.object(guard, 'diagnose', side_effect=checks), \
+             mock.patch.object(guard, '_growth', side_effect=growth):
+            result = guard.validate_and_repair(model, 'biomass', ['new_gap'], {'biomass','old1','old2'})
+        self.assertEqual(result['status'], 'failed')
+        self.assertEqual(result['attempts'][0]['plateau_search']['tested'], 0)
+        self.assertEqual(before, {r.id:r.bounds for r in model.reactions})
+
+    def test_plateau_exception_rolls_back_entire_trial(self):
+        model, target, diagnose, growth = self.plateau_fixture()
+        before = {r.id:r.bounds for r in model.reactions}
+        calls = {'count':0}
+        def discover(m):
+            calls['count'] += 1
+            if calls['count'] > 1:
+                raise RuntimeError('intentional branch failure')
+            return [target], []
+        with mock.patch.object(guard, 'discover_targets', side_effect=discover), \
+             mock.patch.object(guard, 'diagnose', side_effect=diagnose), \
+             mock.patch.object(guard, '_growth', side_effect=growth):
+            with self.assertRaisesRegex(RuntimeError, 'intentional branch failure'):
+                guard.validate_and_repair(model, 'biomass', ['new_gap'], {'biomass','old1','old2'})
+        self.assertEqual(before, {r.id:r.bounds for r in model.reactions})
+
     def test_missing_biomass_is_not_invented(self):
         model = cobra.Model('no_biomass')
         result = guard.validate_and_repair(model, '', [], set())

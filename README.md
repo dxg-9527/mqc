@@ -8,7 +8,9 @@ original `main` branch. It includes the optimized implementation and subsequent
 cluster failure fixes; it is no longer byte-identical to the initial three-strain
 release. Exact source and reference hashes are in `cluster/release_lock.json`.
 
-For the latest fixes and the 213-model follow-up list, see
+For the latest bounded parallel-cycle fixes and the 61/213-model follow-up lists,
+see [the plateau repair release notes](CLUSTER_PLATEAU_FIXES_20261019.md).
+The preceding f40644d release is documented in
 [the cluster review release notes](CLUSTER_REVIEW_FIXES_20261019.md).
 
 See [the Chinese cluster guide](cluster/README_zh.md) for model transfer,

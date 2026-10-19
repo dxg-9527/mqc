@@ -34,7 +34,7 @@
     "mqc/control/model_control.py": "3b15e1237e9d026921fd556c2bc68648f36aa6bc9904b626f66778e1c6f4dce9",
     "mqc/control/metabolite_chemistry.py": "319c12601f0de665e9270e1517c51686d0b6fffad89198365688e9e472c31b47",
     "mqc/control/net_control.py": "01b753bc3b5b4c22bbd117feff3bb8ff00ffc180ea694bfee05c5c34ca13cba4",
-    "mqc/control/postgap_control.py": "0abe681ea639162cbcba660531107f737f435e6ca1eb97bc35fd644c6fc435cd",
+    "mqc/control/postgap_control.py": "f81e4b6c3d39a04269e4db01b3c6b3b6da9be4f3098fc4c73b63d37b3151e03a",
     "mqc/control/nitric_oxide_direction.py": "76652052048260c6ec6ea518ed9cd66bbb2e0a45d237b7aa694ca7b4aa0cad5d",
     "mqc/control/nadh_control.py": "b4773886ad1d239039d0ef87692046a860eb5cec20172e3f85b29705c357c31e",
     "mqc/control/quinone_methylation.py": "08dfcbfc46dce7e78a5429f99914e5412d2bf0d18a09684bef28173646421766",
@@ -66,9 +66,9 @@
   ],
   "model_count": 6543,
   "original_public_commit": "fc15b9cf2ee27bb731c9f5fdf07e27e58d953a72",
-  "parent_git_commit": "ef85b7b71a1c93c5841eff68d4dd87c732332c57",
-  "parent_release_lock_sha256": "8b18cc856246086f803027fafe483387ac40eddf79d6b116d2695ea4d5926e3b",
-  "release": "optimized-cluster-review-fixes-20261019",
+  "parent_git_commit": "f40644d36212bbe4ea659ccc3d1ff9421b1bbe8f",
+  "parent_release_lock_sha256": "904feb41f6dc5da5fda420f8d9a69ca918195e0d56cd747bf9ee86355964674e",
+  "release": "optimized-cluster-plateau-fixes-20261019",
   "runner_hashes": {
     "cluster/array.sbatch": "af6cdb31b75989c3628718db89873a43ce2116ed6a30a9057ca32c172aeaa9ac",
     "cluster/check_environment.py": "e495f0882aa22c4d54617d4718e2a03000a94aa99d0566db779381f9be17d9ca",
@@ -83,7 +83,7 @@
     "cluster/worker.py": "d58ba7c173ae873c821b5855c4c695bbd8154024bb1a8379fa04a5a4bc98f48a",
     "tests/test_cluster_compatibility.py": "6054a0052d883ff27c6cc8e86340a376ddd52e2fea8267f46cc3c56440365694",
     "tests/test_cluster_recovery.py": "304aa29035a5ad6e0ed6b53a717950cb54fb0248b4ee0b9080af22995c836875",
-    "tests/test_cluster_review.py": "ca3e31a668cd9f1db3fbbf2629571f89fa5153fdf22dc3e9700935c7eecc72d0"
+    "tests/test_cluster_review.py": "db3e27e95d99e6f12a9452df5aa16d63493e349cee2ccaa96a014d14b28f6380"
   },
   "schema": 1,
   "validation_environment_python": "3.8.16",
@@ -94,6 +94,8 @@
     "bounded transactional multi-cut cycle fallback",
     "signed boundary and nitrogen yield ledger",
     "temporary unresolved input closure for net assay",
-    "early missing-biomass applicability failure"
+    "early missing-biomass applicability failure",
+    "bounded single-plateau completion search with full rollback",
+    "eight existing direction budget; unchanged energy and growth acceptance"
   ]
 }
