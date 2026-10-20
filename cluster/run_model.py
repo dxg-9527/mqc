@@ -42,6 +42,7 @@ def main():
         from mqc.solver_utils import robust_pfba as pfba
         from cobra.util.solver import linear_reaction_coefficients
         from mqc.main import ModelCheck
+        from mqc.control.auxiliary_supply import validate_supply_budget
         from mqc.control import initial_control,nadh_control,atp_control,net_control,yield_control,biomass_control
         classes=[initial_control.InitialPreprocess,nadh_control.Nadhs,atp_control.Atps,
                  net_control.Nets,yield_control.Yields,biomass_control.Biomasses]
@@ -67,6 +68,11 @@ def main():
         exported.relative_to(output)
         model=load_exported_model(exported)
         control=json.loads((output/'control_result.json').read_text())
+        supply = control.get('auxiliary_supply_budget', {})
+        validate_supply_budget(model, supply)
+        record['auxiliary_supply_status'] = supply.get('status', 'not_reported')
+        record['auxiliary_carbon_accounting'] = supply.get('carbon_accounting', 'not_reported')
+        record['auxiliary_partial_formula_inputs'] = supply.get('partial_formula_inputs', {})
         if control.get('postgap_validation',{}).get('status') not in ('passed','repaired'):
             raise RuntimeError('Final post-gap validation did not pass')
         solution=model.optimize()

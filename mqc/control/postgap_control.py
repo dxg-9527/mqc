@@ -17,6 +17,7 @@ from pathlib import Path
 from cobra import Reaction
 from mqc.solver_utils import robust_pfba as pfba
 from mqc.control.growth_environment import validate_growth_environment
+from mqc.control.auxiliary_supply import validate_supply_budget
 
 
 class PostGapValidationError(RuntimeError):
@@ -423,10 +424,12 @@ def run_postgap_control(model_info, model, model_control_info, cfg, pre_gapfill_
     """Persist auditable status and prevent legacy RuntimeError success fallback."""
     try:
         environment = validate_growth_environment(model, getattr(cfg, "growth_environment", "preserve"))
+        validate_supply_budget(model, model_info.get("auxiliary_supply_budget", {}))
         report = validate_and_repair(model, model_info.get("initial_rxn", {}).get("biomass_rxn_id"),
                                      model_info.get("gaped_rxn", []), pre_gapfill_ids,
                                      reaction_evidence=model_info.get('reactions', []))
         report["growth_environment"] = environment
+        validate_supply_budget(model, model_info.get("auxiliary_supply_budget", {}))
     except Exception as error:
         # Trials are protected by model contexts; never swallow an unknown error
         # as an apparently clean final model.

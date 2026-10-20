@@ -14,6 +14,7 @@ from mqc.control.gapfill_chemistry import assess_gapfill_chemistry, record_gapfi
 from mqc.control.gap_compartments import target_inventory, foreign_compartments
 from mqc.control.proton_duplicate import native_proton_index, proton_duplicate_conflict
 from mqc.control.boundary_diagnostics import unresolved_boundary_source
+from mqc.control.auxiliary_supply import allocate_auxiliary_supply
 from mqc.control.gap_rule_policy import (
     enabled as rule_policy_enabled, apply_native_rules, configure_candidates,
     candidate_copy, rule_pfba,
@@ -2468,7 +2469,7 @@ class Biomasses:
             )
             == -1
         ):
-
+            allocate_auxiliary_supply(model, model_info, model_control_info)
             fins = get_c_mol(model)
             model_info["c_bio"] = fins
             write_flux_file(model_info, model, initial_rxn_id, "biomasss", self.cfg)
@@ -2539,6 +2540,7 @@ class Biomasses:
             )
             == -1
         ):
+            allocate_auxiliary_supply(model, model_info, model_control_info)
             fins = get_c_mol(model)
             model_info["c_bio"] = fins
             write_flux_file(model_info, model, initial_rxn_id, "biomasss", self.cfg)
@@ -2560,6 +2562,7 @@ class Biomasses:
 
         write_flux_file(model_info, model, initial_rxn_id, "biomasss", self.cfg)
         self.Normalized_sustaining_met(model, model_info)
+        allocate_auxiliary_supply(model, model_info, model_control_info)
         self.get_result(
             model_info, model, sustain_result, model_control_info, initial_rxn_id
         )
