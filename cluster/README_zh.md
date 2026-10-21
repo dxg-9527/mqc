@@ -1,6 +1,8 @@
 # 优化版 MQC 集群运行指南
 
-本次只运行优化版修正流程，使用论文的 6,543 个原始模型；回来后与论文现有的 AWS 历史质控结果配对比较，不重跑旧版。优化版发布在 `optimized-20261018` 分支，原 `main` 和 AWS 部署保持不变。
+本指南以论文的6,543个原始模型为例，只运行优化版修正流程，并与论文历史质控结果配对比较，不重跑旧版。优化版已于2026-10-21从 `optimized-20261018` 合入 `main`，科学代码和运行器仍为已验收的 `c9fae34` 版本；AWS网站已于2026-10-20部署同一科学计算版本。新的批次可直接使用 `main`，运行时仍需固定提交号与源码锁。
+
+原批次及定向补跑最终接纳6,516项，其中6,113项沿用 `d7a49ce`，403项使用 `c9fae34`；另有19项失败、6项超时、2项不适用。不要把这一集合标成所有模型都在同一个提交上重跑，也不要把完成数量当成实验预测准确率。
 
 ## 需要传到集群的文件
 
@@ -16,7 +18,7 @@ cd /hpcfs/fhome/dengxg/data/mqc_batch_20261018
 # 将两个输入文件上传到这里后执行
 sha256sum -c mqc_inputs_6543.tar.sha256
 tar -xf mqc_inputs_6543.tar
-git clone --branch optimized-20261018 --single-branch https://github.com/dxg-9527/mqc.git mqc-optimized
+git clone --branch main --single-branch https://github.com/dxg-9527/mqc.git mqc-optimized
 cd mqc-optimized
 git rev-parse HEAD
 ```

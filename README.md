@@ -1,12 +1,13 @@
 # MQC
 
-## Optimized cluster validation release
+## Optimized MQC release
 
-Branch `optimized-20261018` contains the frozen optimized correction implementation
-and a portable Slurm batch runner. It does not replace the AWS deployment or the
-original `main` branch. It includes the optimized implementation and subsequent
-cluster failure fixes; it is no longer byte-identical to the initial three-strain
-release. Exact source and reference hashes are in `cluster/release_lock.json`.
+The `main` branch contains the optimized correction implementation and portable
+Slurm batch runner promoted from `optimized-20261018` on 21 October 2026.
+Its scientific code, reference data and runner retain the validated `c9fae34`
+release without algorithm changes. Exact file hashes are in
+`cluster/release_lock.json`. The same scientific release was deployed to the
+MQC website on 20 October 2026.
 
 For the latest bounded parallel-cycle fixes and the 61/213-model follow-up lists,
 see [the plateau repair release notes](CLUSTER_PLATEAU_FIXES_20261019.md).
@@ -17,9 +18,11 @@ See [the Chinese cluster guide](cluster/README_zh.md) for model transfer,
 environment checks, array submission, failed-job retry, and return files.
 The runner invokes correction only, without a detection pre-run, and preserves
 stage models, flux tables, final exports, failures and version provenance.
-The first cluster run and a 622-model retry used earlier source locks. A full
-6,543-model validation of this new release is still pending; do not merge results
-from different locks as a same-version cohort.
+The completed batch and targeted reruns yielded 6,516 accepted models from
+6,543 inputs: 6,113 retain the `d7a49ce` results and 403 use the `c9fae34`
+auxiliary-carbon-budget fix. The remaining 27 comprise 19 failures, six timeouts
+and two inapplicable inputs. These are execution and export-validation counts,
+not experimental accuracy; the accepted collection is not a single-commit rerun.
 The original runner tests and e_coli_core correction/export smoke run are
 recorded in [the release validation](validation/optimized_cluster_smoke_20261018.json).
 
@@ -42,8 +45,8 @@ in `cluster/requirements-validated.txt`. Follow the cluster guide for this study
 the generic installation below does not reproduce its validated environment.
 
 ```bash
-git clone --branch optimized-20261018 --single-branch https://github.com/dxg-9527/mqc.git mqc-optimized
-cd mqc-optimized
+git clone --branch main https://github.com/dxg-9527/mqc.git
+cd mqc
 python -m pip install .
 ```
 
@@ -112,8 +115,13 @@ directory. Cluster tools live in `cluster/` and run correction without a detecti
 
 ## Validation
 
+The [main promotion checks](validation/main_promotion_20261021.json) record
+release-file identity and regression tests. The optimization branch remains
+available for reproducible checkouts. The original public baseline is retained
+in Git history at `fc15b9c`.
+
 The AWS equivalence records below describe the original public baseline, not
-the optimized branch. Optimized outputs are expected to differ from that
+the current optimized release. Optimized outputs are expected to differ from that
 baseline. The cluster runner preserves both successful and unsuccessful cases
 for comparison with the manuscript's historical corrected-model cohort.
 

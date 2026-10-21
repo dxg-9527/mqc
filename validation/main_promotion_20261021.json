@@ -1,0 +1,446 @@
+{
+  "purpose": "Promote the verified optimized branch without changing computation",
+  "original_main_commit": "fc15b9cf2ee27bb731c9f5fdf07e27e58d953a72",
+  "optimized_source_commit": "c9fae3451c5681b9646456f468f1825103113c1a",
+  "release_lock_sha256": "95aaa14b528c83cf73c9b95e932bcf2f95be760a6830af4f98caeb7c007931d1",
+  "python": "3.8.16",
+  "packages": {
+    "cobra": "0.29.1",
+    "cplex": "22.1.0.0",
+    "numpy": "1.22.4",
+    "pandas": "1.5.3",
+    "optlang": "1.8.2"
+  },
+  "runtime_container_digest": "sha256:8c75266135177179c91ed9ca917f10def84917e49f5737f76c08969a695c497f",
+  "files_checked": [
+    {
+      "path": "mqc/__main__.py",
+      "group": "core_hashes",
+      "sha256": "d190bfeba4735410597452a8fa24fc9ac7a2881d95f920dacd44d7689fd8369e",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/solver_utils.py",
+      "group": "core_hashes",
+      "sha256": "29c8a356a0f47bb5dd1a85930232163bb50cc4281be0f24d32c631f170650126",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/main.py",
+      "group": "core_hashes",
+      "sha256": "e30aa0789598f7ed3b227570553985094f54f44a58af8617cd228a0529a77ae3",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/config.py",
+      "group": "core_hashes",
+      "sha256": "5350f415357b771f8ebe6d758bc711be67a05c14aa887683e7556b2c40dcfd0d",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/mqcpath_visualization.py",
+      "group": "core_hashes",
+      "sha256": "7d6ec9987c58e67b891136806046e0626c03e0e4d577767f0b5b970f66504a7d",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/__init__.py",
+      "group": "core_hashes",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/defaults.py",
+      "group": "core_hashes",
+      "sha256": "475ca4a71a56249af5413ec2742e9ade39f68c1dc26304d4bad4cb30960a4529",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/utils.py",
+      "group": "core_hashes",
+      "sha256": "670f5cbe286961de515896c4434d5998df2a218bd4d9a45de517697892d2a40b",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/library_charge.py",
+      "group": "core_hashes",
+      "sha256": "7d2511c530aa54cc74eaa9af0e929a98f362608314d0853843d524ab5e9d94ba",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/growth_environment.py",
+      "group": "core_hashes",
+      "sha256": "a9d49936e41f9a5d7c1d3b30b4eade4bd61fa4a6ff2611d652098d33132781a2",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/atp_control.py",
+      "group": "core_hashes",
+      "sha256": "476ecb50f5540d949d0f93680b46c2ee4a1573a1ca1225b0838e7a9471b7d501",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/gap_compartments.py",
+      "group": "core_hashes",
+      "sha256": "33192133de237d26add15f692e47c379e74b8be2591a2aedc9d91958de9b59d6",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/metacyc_direction.py",
+      "group": "core_hashes",
+      "sha256": "ce8c2cdb801d4809c3fa2ae8279bb5aa186a344f33c376b24d7a0c2622f20458",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/gap_rule_policy.py",
+      "group": "core_hashes",
+      "sha256": "2b418c999c53935a6b76626c833fda3c01d8b0a0e321d0e8deee7bcd305d5426",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/formula_charge_pairing.py",
+      "group": "core_hashes",
+      "sha256": "c5e322d1743fcf02cfe0732476c435530dd67b5ce73ee85dbed00b98a95751fa",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/desulfurase_direction.py",
+      "group": "core_hashes",
+      "sha256": "a6f6796d0d410642719ad81435f3595b557b1fb7e89a5fcae27cd1a5e0220118",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/initial_control.py",
+      "group": "core_hashes",
+      "sha256": "2c330d063493b0c9b689208ec18c5ca1715dd9deb9c5244a7f5e517b9eb2a148",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/electron_stoichiometry.py",
+      "group": "core_hashes",
+      "sha256": "b727604809021d6f60cbfaacc72628c364ca074502ca1643c958df5878accf7a",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/flavodoxin_identity.py",
+      "group": "core_hashes",
+      "sha256": "8ef549050ff5ace0166de5f9f6995494ffb21052bb4d467ad955f7d869e0d7b3",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/biomass_control.py",
+      "group": "core_hashes",
+      "sha256": "462eae39b6dbb2eb17425f6d773e7dc46e357a340637306385927ef1ad49186c",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/auxiliary_supply.py",
+      "group": "core_hashes",
+      "sha256": "4abd8f7765a250dfc6ad56b0a81ade6521a37d214dd2cec00993358a90ed7570",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/yield_control.py",
+      "group": "core_hashes",
+      "sha256": "06d0c14c63ca1403d3cc8f93946d5c8e42371f6a37b906a7eb1f50cfe25a1e67",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/biotin_direction.py",
+      "group": "core_hashes",
+      "sha256": "2d37eb2e3d5fc2078cf9c1751bedd3446fe3b32359e1cf4c1ccd1a4480b8729a",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/rules_control.py",
+      "group": "core_hashes",
+      "sha256": "454e7731781938a5e66a05204091ea79ba53dd1e636a0c94fe6afe077eb3e497",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/native_coverage.py",
+      "group": "core_hashes",
+      "sha256": "50c44c691a68950eb3d13b18b63fed3b7a90d703dc63d3b1416d7790f94d908e",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/proton_duplicate.py",
+      "group": "core_hashes",
+      "sha256": "d57302fcdaaebfba5fd7fa449167c3b89ab29e81f2fe7bea1697f0b84f80800d",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/deacetylase_direction.py",
+      "group": "core_hashes",
+      "sha256": "4089b48bec06587eabfdfb8199711154473b2fc759f54e8b03925d27049a5063",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/pathway_rules.py",
+      "group": "core_hashes",
+      "sha256": "d0bfbd243df8dfdae3aebfaf4f9494077b6bd8c704772f0f9e3d9cf47b5a10be",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/gapfill_chemistry.py",
+      "group": "core_hashes",
+      "sha256": "40b92ae4424ddd77d24c2fff66d68ac84ea59e564956fb9cf3c109f48226914b",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/__init__.py",
+      "group": "core_hashes",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/rules_control2.py",
+      "group": "core_hashes",
+      "sha256": "cb9593225d90e2c291f8c71e0feeaaf912e77154e63a630d7d830a095e2962a3",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/model_control.py",
+      "group": "core_hashes",
+      "sha256": "3b15e1237e9d026921fd556c2bc68648f36aa6bc9904b626f66778e1c6f4dce9",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/metabolite_chemistry.py",
+      "group": "core_hashes",
+      "sha256": "319c12601f0de665e9270e1517c51686d0b6fffad89198365688e9e472c31b47",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/net_control.py",
+      "group": "core_hashes",
+      "sha256": "01b753bc3b5b4c22bbd117feff3bb8ff00ffc180ea694bfee05c5c34ca13cba4",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/postgap_control.py",
+      "group": "core_hashes",
+      "sha256": "7c742be16b625bf94b17c0637ee368a820a84ce8927836b0aedf0b3d5ca3c1fc",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/nitric_oxide_direction.py",
+      "group": "core_hashes",
+      "sha256": "76652052048260c6ec6ea518ed9cd66bbb2e0a45d237b7aa694ca7b4aa0cad5d",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/nadh_control.py",
+      "group": "core_hashes",
+      "sha256": "b4773886ad1d239039d0ef87692046a860eb5cec20172e3f85b29705c357c31e",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/quinone_methylation.py",
+      "group": "core_hashes",
+      "sha256": "08dfcbfc46dce7e78a5429f99914e5412d2bf0d18a09684bef28173646421766",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/check_control.py",
+      "group": "core_hashes",
+      "sha256": "2b82c17f9c532d74624a945ed4739cd0705d28a4d632c466183d9a338a33f45d",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/preprocessing_control.py",
+      "group": "core_hashes",
+      "sha256": "519d8591c78a5b1684698173c21fc46ce629eb624d94b87876643d7c38f186ae",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/summary/virtual_met.xlsx",
+      "group": "core_hashes",
+      "sha256": "fd21de0ac3118dce839771add724dd9580a1a0b13a8eeef67e9bc22415ef48e2",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/summary/MetacycRule.xlsx",
+      "group": "core_hashes",
+      "sha256": "269eb0b3d875cef568e5ee939830208b2ca0f5aff7fdcf5e8e52881a5714f2ff",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/summary/merged_meta_model.xml.gz",
+      "group": "core_hashes",
+      "sha256": "935a1ed5ef7ee7e36f60c6b525102f20397f712dce0f53199f984a753846f855",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/summary/general_library.xml.gz",
+      "group": "core_hashes",
+      "sha256": "2f9eb7c6864c1d5b4ce52b53f6dec3b38b0d6ad1d255d08b00f92cbf14129928",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/summary/__init__.py",
+      "group": "core_hashes",
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/summary/bigg_metacyc.xlsx",
+      "group": "core_hashes",
+      "sha256": "28e4bf512eadc28db3803f5cd82238d8e78adab3b250b949cd05bb3fea6c883f",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/summary/modelseed_reactions.xlsx",
+      "group": "core_hashes",
+      "sha256": "95f4f0d04ed4fcaa59e386f974f64baed6581e42b821a363077d2b2e1e0ae257",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/summary/meta_met.xlsx",
+      "group": "core_hashes",
+      "sha256": "49f41bd03ea0b4cb4453977e15f98a579fcde01f4b7e45068e6d3273c4b6e192",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/summary/modelseed_met.xlsx",
+      "group": "core_hashes",
+      "sha256": "ef9682c564b2cf53f5143c47cce32ef357074286472602512bcd0be74af7216a",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/summary/kegg_met.xlsx",
+      "group": "core_hashes",
+      "sha256": "957736190befcdee24bdd08f10e83974c374a35226ea5dfa333d9ff22d1dce75",
+      "matches_release": true
+    },
+    {
+      "path": "mqc/control/boundary_diagnostics.py",
+      "group": "core_hashes",
+      "sha256": "053c6b4f4b19e04f022bb6181d3bbbdb4d3c3932d049bb07d98f98218984c84f",
+      "matches_release": true
+    },
+    {
+      "path": "cluster/array.sbatch",
+      "group": "runner_hashes",
+      "sha256": "af6cdb31b75989c3628718db89873a43ce2116ed6a30a9057ca32c172aeaa9ac",
+      "matches_release": true
+    },
+    {
+      "path": "cluster/check_environment.py",
+      "group": "runner_hashes",
+      "sha256": "e495f0882aa22c4d54617d4718e2a03000a94aa99d0566db779381f9be17d9ca",
+      "matches_release": true
+    },
+    {
+      "path": "cluster/collect.py",
+      "group": "runner_hashes",
+      "sha256": "96698349444a0233003e896cecf13db6f5a00593b712c24094f0a5d4bec6aadb",
+      "matches_release": true
+    },
+    {
+      "path": "cluster/common.py",
+      "group": "runner_hashes",
+      "sha256": "5ba0d8d5c3fd507874802a9f8d872988689f32feb8da6a2146b1c1b1d18b2fc0",
+      "matches_release": true
+    },
+    {
+      "path": "cluster/prepare_inputs.py",
+      "group": "runner_hashes",
+      "sha256": "23a50bd3e8dcf1629ff860b2bc38cea9bd1139791e6a033e8587256e8f904a5a",
+      "matches_release": true
+    },
+    {
+      "path": "cluster/requirements-validated.txt",
+      "group": "runner_hashes",
+      "sha256": "6fd9e5a1dc9dbc2ff7d682d38f751e9c9af7c1346b2b95ff00c1aa5edafc82c7",
+      "matches_release": true
+    },
+    {
+      "path": "cluster/run_model.py",
+      "group": "runner_hashes",
+      "sha256": "094aeb7dc9e1dcd8206f6dcf84fffc15406ad5f30e59f2e1ba511a88e2689f13",
+      "matches_release": true
+    },
+    {
+      "path": "tests/test_auxiliary_supply.py",
+      "group": "runner_hashes",
+      "sha256": "93b2c604ae5179d75f801372695749049d481e7080517b73e6a99ee3d913afdc",
+      "matches_release": true
+    },
+    {
+      "path": "cluster/rerun_auxiliary_affected_20261020.csv",
+      "group": "runner_hashes",
+      "sha256": "538e931badbfb49c7a225927e7369458295014a99cfe4a3d25ca0928d5cbd9b9",
+      "matches_release": true
+    },
+    {
+      "path": "cluster/rerun_auxiliary_databases_20261020.csv",
+      "group": "runner_hashes",
+      "sha256": "3cadaa12a3762941b423c6cb0a225c0ecd533465df9585ca155ecacf9b94c342",
+      "matches_release": true
+    },
+    {
+      "path": "cluster/submit.py",
+      "group": "runner_hashes",
+      "sha256": "181dbe0693405f45b1c7b2eac12941d9213985299a2ceee516c7ba6e07af2f91",
+      "matches_release": true
+    },
+    {
+      "path": "cluster/test_tools.py",
+      "group": "runner_hashes",
+      "sha256": "122981fc6e98f7763f159d2ec87a7dba0990f6ed2db5cb1cdf7d2ed6699ebba5",
+      "matches_release": true
+    },
+    {
+      "path": "cluster/verify_inputs.py",
+      "group": "runner_hashes",
+      "sha256": "3b7e82386c5d4cf750954b3839fef6c9213e4cda3010da84e00dfa70f6739671",
+      "matches_release": true
+    },
+    {
+      "path": "cluster/worker.py",
+      "group": "runner_hashes",
+      "sha256": "d58ba7c173ae873c821b5855c4c695bbd8154024bb1a8379fa04a5a4bc98f48a",
+      "matches_release": true
+    },
+    {
+      "path": "tests/test_cluster_compatibility.py",
+      "group": "runner_hashes",
+      "sha256": "6054a0052d883ff27c6cc8e86340a376ddd52e2fea8267f46cc3c56440365694",
+      "matches_release": true
+    },
+    {
+      "path": "tests/test_cluster_recovery.py",
+      "group": "runner_hashes",
+      "sha256": "304aa29035a5ad6e0ed6b53a717950cb54fb0248b4ee0b9080af22995c836875",
+      "matches_release": true
+    },
+    {
+      "path": "tests/test_cluster_review.py",
+      "group": "runner_hashes",
+      "sha256": "db3e27e95d99e6f12a9452df5aa16d63493e349cee2ccaa96a014d14b28f6380",
+      "matches_release": true
+    }
+  ],
+  "test_suites": [
+    {
+      "suite": "runtime",
+      "tests_run": 43,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    },
+    {
+      "suite": "cluster_runner",
+      "tests_run": 8,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "passed": true
+    }
+  ],
+  "new_model_batch_run": false,
+  "aws_deployment_changed_by_this_promotion": false,
+  "passed": true
+}
